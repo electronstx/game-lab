@@ -1,11 +1,17 @@
 import { Application } from 'pixi.js';
-import { GameScene } from './scenes/game-scene.js';
+import RpsScene from './view/rps-scene.js';
+import RpsGameData from './data/rps-game-data.js';
+import RpsGameflow from './flow/rps-gameflow.js';
+import { RpsGameSettings } from './types.js';
 import { ScaleManager } from "./utils/scale.js";
+import { GameStates } from '@parity-games/core';
 
 export class Game {
 	#app!: Application;
-	#gameScene!: GameScene;
-	#sceneReady!: Promise<GameScene>;
+	#gameScene!: RpsScene;
+	#gameData!: RpsGameData;
+	#gameflow!: RpsGameflow;
+	#sceneReady!: Promise<RpsScene>;
 	#scaleManager!: ScaleManager;
 
 	async init(parent: HTMLDivElement) {
@@ -24,9 +30,14 @@ export class Game {
 
 			this.#scaleManager = new ScaleManager(this.#app, parent, 1280, 768, 'contain');
 
-			this.#gameScene = new GameScene(this.#app, this.#scaleManager.scale);
+			this.#gameScene = new RpsScene(this.#app, this.#scaleManager.scale);
 			await this.#gameScene.create();
 			this.#app.stage.addChild(this.#gameScene);
+
+			const gameSettings: RpsGameSettings = { bestOf: 5};
+			this.#gameData = new RpsGameData(gameSettings, GameStates.INIT);
+
+			this.#gameflow = new RpsGameflow(this.#gameData, this.#gameScene);
 
 			this.#scaleManager.onResize((scale, w, h) => {
 				this.#gameScene.onResize(scale, w, h);
@@ -39,11 +50,11 @@ export class Game {
 		return this;
 	}
 
-	get scene(): GameScene {
+	get scene(): RpsScene {
 		return this.#gameScene;
 	}
 
-	get whenReady(): Promise<GameScene> {
+	get whenReady(): Promise<RpsScene> {
 		return this.#sceneReady;
 	}
 

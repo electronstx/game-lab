@@ -1,8 +1,3 @@
-export type GameWasLoadedEvent = {
-    type: 'GAME_WAS_LOADED';
-    payload?: undefined;
-}
-
 export type GameStartedEvent = {
     type: 'GAME_STARTED';
     payload?: undefined;
@@ -32,14 +27,12 @@ export type GameEndEvent = {
 }
 
 export type GameEvent =
-    | GameWasLoadedEvent
     | GameStartedEvent
     | RoundStartedEvent
     | RoundCompletedEvent
     | GameEndEvent;
 
 export const GameEvents = {
-    GAME_WAS_LOADED: 'GAME_WAS_LOADED',
     GAME_STARTED: 'GAME_STARTED',
     ROUND_STARTED: 'ROUND_STARTED',
     ROUND_COMPLETED: 'ROUND_COMPLETED',
