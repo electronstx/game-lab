@@ -12,11 +12,11 @@ export default defineConfig({
             formats: ['es']
         },
         rollupOptions: {
-            external: ['react', 'react-dom', 'react/jsx-runtime'],
+            external: ['react', 'react-dom', 'react/jsx-runtime', 'pixi.js'],
             output: {
                 globals: {
-                react: 'React',
-                'react-dom': 'ReactDOM'
+                    react: 'React',
+                    'react-dom': 'ReactDOM'
                 }
             }
         }

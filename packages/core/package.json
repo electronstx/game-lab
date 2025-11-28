@@ -21,7 +21,7 @@
         "lint": "biome check ."
     },
     "dependencies": {
-        "pixi.js": "^8.14.0"
+        "pixi.js": "^8.14.3"
     },
     "peerDependencies": {
         "react": "^18.3.1",

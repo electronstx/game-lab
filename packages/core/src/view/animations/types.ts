@@ -1,5 +1,5 @@
 export type GameAnimation = {
-    create: () => void;
+    create: (...args: any[]) => void;
     reset: () => void;
     show: (...args: any[]) => void;
 };

@@ -11,6 +11,7 @@ export class ScaleManager {
     #mode: ScaleMode;
     #scale = 1;
     #listeners: ScaleListener[] = [];
+    #resizeHandler = () => this.#resize();
 
     constructor(app: Application, parent: HTMLElement, baseWidth = 1280, baseHeight = 768, mode: ScaleMode = 'contain') {
         this.#app = app;
@@ -19,7 +20,7 @@ export class ScaleManager {
         this.#baseHeight = baseHeight;
         this.#mode = mode;
 
-        window.addEventListener('resize', () => this.#resize());
+        window.addEventListener('resize', this.#resizeHandler);
         this.#resize();
     }
 
@@ -58,5 +59,10 @@ export class ScaleManager {
         this.#listeners.forEach(cb => {
             cb(this.#scale, width, height);
         });
+    }
+
+    cleanup(): void {
+        window.removeEventListener('resize', this.#resizeHandler);
+        this.#listeners = [];
     }
 }

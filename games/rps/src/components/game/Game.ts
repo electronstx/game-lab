@@ -1,10 +1,11 @@
-import { Application } from 'pixi.js';
+import { Application, Rectangle } from 'pixi.js';
 import RpsScene from './view/rps-scene.js';
 import RpsGameData from './data/rps-game-data.js';
 import RpsGameflow from './flow/rps-gameflow.js';
 import { RpsGameSettings } from './types.js';
 import { ScaleManager } from "./utils/scale.js";
 import { GameStates } from '@parity-games/core';
+import { getAssets } from './assets-manifest.js';
 
 export class Game {
 	#app!: Application;
@@ -15,6 +16,10 @@ export class Game {
 	#scaleManager!: ScaleManager;
 
 	async init(parent: HTMLDivElement) {
+		if (this.#app) {
+			this.destroy();
+		}
+
 		this.#app = new Application();
 
 		this.#sceneReady = (async () => {
@@ -26,9 +31,11 @@ export class Game {
 				resizeTo: parent
 			});
 
-			parent.appendChild(this.#app.canvas);
+			await getAssets();
 
 			this.#scaleManager = new ScaleManager(this.#app, parent, 1280, 768, 'contain');
+
+			parent.appendChild(this.#app.canvas);
 
 			this.#gameScene = new RpsScene(this.#app, this.#scaleManager.scale);
 			await this.#gameScene.create();
@@ -87,8 +94,26 @@ export class Game {
 	}
 
 	destroy() {
-		if(this.#app){
-			this.#app.destroy();
+		if (this.#app) {
+			if (this.#app.canvas && this.#app.canvas.parentNode) {
+				this.#app.canvas.parentNode.removeChild(this.#app.canvas);
+			}
+			
+			if (this.#gameflow) {
+				this.#gameflow.cleanupEventHandlers();
+			}
+			
+			if (this.#scaleManager) {
+				this.#scaleManager.cleanup();
+			}
+			
+			this.#app.destroy(true);
+			this.#app = null as any;
 		}
+		
+		this.#gameScene = null as any;
+		this.#gameData = null as any;
+		this.#gameflow = null as any;
+		this.#scaleManager = null as any;
 	}
 }

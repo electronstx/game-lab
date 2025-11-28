@@ -102,8 +102,8 @@ export default abstract class Gameflow {
         this.#eventHandlers.clear();
     }
 
-    public abstract startGame(): void;
-    public abstract startRound(roundNumber: number): void;
-    public abstract showRoundResult(...args: any[]): void;
-    public abstract showEndGame(result: any, timescale?: number): void;
+    abstract startGame(): void;
+    abstract startRound(roundNumber: number): void;
+    abstract showRoundResult(...args: any[]): void;
+    abstract showEndGame(result: any, timescale?: number): void;
 }

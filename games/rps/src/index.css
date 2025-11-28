@@ -14,4 +14,26 @@ body {
     
 #root {
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.game-wrapper {
+    width: 1280px;
+    height: 768px;
+    border: 1px solid #333;
+    position: relative;
+}
+
+.game-wrapper canvas {
+    display: block;
+    pointer-events: auto !important;
 }
