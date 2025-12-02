@@ -15,7 +15,8 @@
         "pixi.js": "^8.14.3",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "@parity-games/core": "workspace:*"
+        "@parity-games/core": "workspace:*",
+        "@parity-games/ui": "workspace:*"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.2.4",

@@ -4,11 +4,12 @@ import RpsGameData from './data/rps-game-data.js';
 import RpsGameflow from './flow/rps-gameflow.js';
 import { RpsGameSettings } from './types.js';
 import { ScaleManager } from "./utils/scale.js";
-import { GameStates } from '@parity-games/core';
+import { GameStates, soundService } from '@parity-games/core';
 import { getAssets } from './assets-manifest.js';
 import { initGameSounds } from './sounds.js';
+import { Game } from '@parity-games/ui';
 
-export class Game {
+export class RpsGame implements Game {
 	#app!: Application;
 	#gameScene!: RpsScene;
 	#gameData!: RpsGameData;
@@ -29,20 +30,25 @@ export class Game {
 				resolution: window.devicePixelRatio || 1,
 				autoDensity: true,
 				preference: 'webgl',
-				resizeTo: parent
+				resizeTo: parent,
+				autoStart: false
 			});
 
 			await getAssets();
 
 			initGameSounds();
 
-			this.#scaleManager = new ScaleManager(this.#app, parent, 1280, 768, 'contain');
-
 			parent.appendChild(this.#app.canvas);
 
+			this.#scaleManager = new ScaleManager(this.#app, parent, 1280, 768, 'contain');
+
 			this.#gameScene = new RpsScene(this.#app, this.#scaleManager.scale);
-			await this.#gameScene.create();
 			this.#app.stage.addChild(this.#gameScene);
+			await this.#gameScene.create();
+
+			if (this.#app.ticker && !this.#app.ticker.started) {
+				this.#app.ticker.start();
+			}
 
 			const gameSettings: RpsGameSettings = { bestOf: 5};
 			this.#gameData = new RpsGameData(gameSettings, GameStates.INIT);
@@ -98,7 +104,7 @@ export class Game {
 
 	destroy() {
 		if (this.#app) {
-			if (this.#app.canvas && this.#app.canvas.parentNode) {
+			if (this.#app.renderer && this.#app.canvas && this.#app.canvas.parentNode) {
 				this.#app.canvas.parentNode.removeChild(this.#app.canvas);
 			}
 			
@@ -110,7 +116,11 @@ export class Game {
 				this.#scaleManager.cleanup();
 			}
 			
-			this.#app.destroy(true);
+			soundService.cleanup();
+
+			if (this.#app.renderer) {
+				this.#app.destroy(true);
+			}
 			this.#app = null as any;
 		}
 		

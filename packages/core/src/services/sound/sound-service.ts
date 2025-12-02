@@ -8,12 +8,27 @@ class SoundService {
 	#sounds: Map<SoundKey, Howl>;
 	#soundTypes: Map<SoundKey, SoundType>;
 	#playingSounds: Map<SoundKey, number[]>;
+	#pageUnloadHandler: (() => void) | null = null;
 
 	constructor() {
 		this.#soundSettings = this.#loadSettings();
 		this.#sounds = new Map();
 		this.#soundTypes = new Map();
 		this.#playingSounds = new Map();
+		this.#setupPageUnloadHandler();
+	}
+
+	#setupPageUnloadHandler(): void {
+		if (typeof window === 'undefined') return;
+
+		this.#pageUnloadHandler = () => {
+			Howler.stop();
+			this.#playingSounds.clear();
+		};
+
+		window.addEventListener('beforeunload', this.#pageUnloadHandler, { capture: true });
+		window.addEventListener('pagehide', this.#pageUnloadHandler, { capture: true });
+		window.addEventListener('unload', this.#pageUnloadHandler, { capture: true });
 	}
 
     #loadSettings(): SoundSettingsState {
@@ -229,13 +244,17 @@ class SoundService {
 	}
 
     stopAll(): void {
-		for (const sound of this.#sounds.values()) {
-			sound.stop();
-		}
+		Howler.stop();
 		this.#playingSounds.clear();
 	}
 
 	cleanup(): void {
+		if (this.#pageUnloadHandler && typeof window !== 'undefined') {
+			window.removeEventListener('beforeunload', this.#pageUnloadHandler, { capture: true });
+			window.removeEventListener('pagehide', this.#pageUnloadHandler, { capture: true });
+			window.removeEventListener('unload', this.#pageUnloadHandler, { capture: true });
+		}
+		
 		this.stopAll();
 		for (const sound of this.#sounds.values()) {
 			sound.unload();

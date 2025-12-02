@@ -1,0 +1,36 @@
+{
+    "name": "@parity-games/ui",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [],
+    "scripts": {
+        "build": "vite build && tsc --emitDeclarationOnly --outDir dist",
+        "dev": "vite build --watch",
+        "lint": "biome check ."
+    },
+    "dependencies": {},
+    "peerDependencies": {
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^2.2.4",
+        "@types/react": "^18.3.1",
+        "@types/react-dom": "^18.3.1",
+        "@vitejs/plugin-react": "^4.3.1",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "typescript": "^5.9.2",
+        "vite": "^5.4.0"
+    }
+}

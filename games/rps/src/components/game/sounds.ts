@@ -32,7 +32,9 @@ export function initGameSounds() {
 		volume: 0.1
 	});
 
-	soundService.play('bgMusic');
+	if (!soundService.isPlaying('bgMusic')) {
+		soundService.play('bgMusic');
+	}
 }
 
 export function playClickSound() {
