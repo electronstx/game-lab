@@ -11,6 +11,7 @@ export class EndGameAnimation implements GameAnimation {
 	#endText?: PIXI.Text;
 	#end?: PIXI.Container;
 	#endTween?: gsap.core.Tween;
+	#autoRestartTimeout?: any;
 
 	constructor(scene: RpsScene) {
 		this.#scene = scene;
@@ -21,13 +22,6 @@ export class EndGameAnimation implements GameAnimation {
         this.#endPanelBack.rect(0, 0, this.#scene.app.renderer.width, this.#scene.app.renderer.height)
             .fill({ color: 0x000000, alpha: 0.8 });
         this.#endPanelBack.visible = false;
-        this.#endPanelBack.eventMode = 'static';
-        this.#endPanelBack.cursor = 'pointer';
-        this.#endPanelBack.on('pointerdown', () => {
-            this.reset();
-			playClickSound();
-            this.#scene.app.stage.emit(GameEvents.GAME_RESTARTED);
-        });
         this.#scene.addChild(this.#endPanelBack);
 
 		this.#end = new PIXI.Container();
@@ -70,6 +64,11 @@ export class EndGameAnimation implements GameAnimation {
 			this.#endTween.kill();
 			this.#endTween = undefined;
 		}
+
+		if (this.#autoRestartTimeout) {
+			clearTimeout(this.#autoRestartTimeout);
+			this.#autoRestartTimeout = undefined;
+		}
 	}
 
 	show(text: string): void {
@@ -81,7 +80,7 @@ export class EndGameAnimation implements GameAnimation {
 		playEndGameSound(text);
 
 		this.#end.visible = true;
-		this.#endText.text = `${text}\nClick on the screen to restart the game!`;
+		this.#endText.text = `${text}`;
 
 		this.#end.scale.set(1);
 		this.#end.alpha = 1;
@@ -98,6 +97,14 @@ export class EndGameAnimation implements GameAnimation {
 			yoyo: true,
 			repeat: -1
 		});
+
+		this.#autoRestartTimeout = setTimeout(() => {
+			this.reset();
+			this.#scene.app.stage.emit(GameEvents.GAME_RESTARTED);
+		}, 5000);
 	}
 
+	destroy(): void {
+		this.reset();
+	}
 }

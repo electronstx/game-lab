@@ -1,0 +1,20 @@
+.sound-settings {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.sound-settings-button {
+    min-width: auto;
+}
+
+.sound-settings-button.icon {
+    padding: 6px;
+}
+
+.sound-settings-icon {
+    width: 32px;
+    height: 32px;
+    display: block;
+    object-fit: contain;
+}

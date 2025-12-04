@@ -1,31 +1,26 @@
-import { CreateForm, FooterPanel, GameContainer, HeaderPanel } from "@parity-games/ui";
-import { RpsGame } from "./components/game/index.js";
-import { useCallback, useRef } from "react";
-import { RpsGameSettings as RpsGameSettingsType } from "./components/game/types.js";
+import { CreateForm, FooterPanel, GameContainer, HeaderPanel, SoundSettings } from "@parity-games/ui";
 import { RpsGameSettings } from "./components/ui/features/RpsGameSettings/RpsGameSettings.js";
+import { useSoundSettings } from "./utils/hooks/useSoundSettings.js";
+import { useRpsGame } from "./utils/hooks/useRpsGame.js";
 
 export const RpsGamePage = () => {
-    const gameRef = useRef<RpsGame | null>(null);
-    const createGame = useCallback(() => {
-        if (!gameRef.current) {
-            gameRef.current = new RpsGame();
-        }
-        return gameRef.current;
-    }, []);
-
-    const handleStartGame = useCallback(async (settings: RpsGameSettingsType) => {
-        if (gameRef.current) {
-            await gameRef.current.setGameSettings(settings);
-            await gameRef.current.startGame();
-        }
-    }, []);
+    const { soundSettings, toggleSound, toggleMusic } = useSoundSettings();
+    const { createGame, startGame, isGameStarted } = useRpsGame();
 
     return (
         <>
-            <HeaderPanel title={'Rock Paper Scissors'}/>
-            <CreateForm>
-                <RpsGameSettings onStart={handleStartGame} />
-            </CreateForm>
+            <HeaderPanel title={'Rock Paper Scissors'}>
+                <SoundSettings 
+                    settings={soundSettings}
+                    onToggleSound={toggleSound}
+                    onToggleMusic={toggleMusic}
+                />
+            </HeaderPanel>
+            {!isGameStarted && (
+                <CreateForm>
+                    <RpsGameSettings onStart={startGame} />
+                </CreateForm>
+            )}
             <GameContainer createGame={createGame}/>
             <FooterPanel />
         </>

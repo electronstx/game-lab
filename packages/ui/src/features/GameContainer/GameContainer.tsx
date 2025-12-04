@@ -14,18 +14,25 @@ export const GameContainer = (props: GameContainerProps) => {
     useEffect(() => {
         const container = containerRef.current;
         if (!container) return;
-
+    
         const game = gameRef.current;
         if (!game) return;
-
+    
+        let isMounted = true;
+    
         game.init(container)
-            .then(() => { setIsInitialized(true) })
+            .then(() => {
+                if (isMounted) {
+                    setIsInitialized(true);
+                }
+            })
             .catch((error) => {
                 console.error('Failed to initialize game:', error);
                 props.onError?.(error);
             });
-
+    
         return () => {
+            isMounted = false;
             if (game) {
                 game.destroy();
             }

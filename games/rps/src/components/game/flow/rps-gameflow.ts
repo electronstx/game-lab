@@ -42,15 +42,15 @@ export default class RpsGameflow extends Gameflow{
     protected override setupCustomEventHandlers(): void {
         const animationCompletedHandler = (roundResultData: unknown) => {
             if (!isRoundResultData(roundResultData)) return;
-
+    
             if (roundResultData.result) {
                 this.scene.app.stage.emit(GameEvents.GAME_END, roundResultData.result);
                 return;
             }
-
+    
             this.scene.app.stage.emit(GameEvents.ROUND_STARTED);
         };
-
-        this.scene.app.stage.on('ANIMATION_COMPLETED', animationCompletedHandler);
+    
+        this.subscribe('ANIMATION_COMPLETED', animationCompletedHandler);
     }
 }

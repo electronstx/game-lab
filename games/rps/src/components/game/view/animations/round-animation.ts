@@ -13,6 +13,7 @@ export class RoundAnimation implements GameAnimation {
     #opponentCard?: PIXI.Sprite;
     #screenFlash?: PIXI.Graphics;
     #shakeTweens?: gsap.core.Timeline[];
+    #timeouts?: any[];
 
     constructor(scene: RpsScene) {
         this.#scene = scene;
@@ -83,6 +84,11 @@ export class RoundAnimation implements GameAnimation {
         if (this.#screenFlash) {
             this.#screenFlash.visible = false;
             this.#screenFlash.alpha = 0;
+        }
+
+        if (this.#timeouts) {
+            this.#timeouts.forEach(timeout => clearTimeout(timeout));
+            this.#timeouts = undefined;
         }
     }
 
@@ -223,7 +229,11 @@ export class RoundAnimation implements GameAnimation {
 
         this.#playFlashAnimation(1.5);
 
-        setTimeout(() => {
+        if (!this.#timeouts) {
+            this.#timeouts = [];
+        }
+
+        const timeout1 = setTimeout(() => {
             if (!this.#playerCard || !this.#opponentCard) return;
 
             this.#playerCard.texture = PIXI.Texture.from(roundResultData.playerMove);
@@ -236,10 +246,20 @@ export class RoundAnimation implements GameAnimation {
 
             this.#playVictoryAnimation(roundResultData.roundWinner);
         }, 1500);
+        this.#timeouts.push(timeout1);
 
-        setTimeout(() => {
+        const timeout2 = setTimeout(() => {
             this.#scene.app.stage.emit('ANIMATION_COMPLETED', roundResultData);
             this.reset();
         }, 5000);
+        this.#timeouts.push(timeout2);
+    }
+
+    destroy(): void {
+        if (this.#timeouts) {
+            this.#timeouts.forEach(timeout => clearTimeout(timeout));
+            this.#timeouts = undefined;
+        }
+        this.reset();
     }
 }

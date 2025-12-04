@@ -69,38 +69,49 @@ export default abstract class Gameflow {
     }
 
     #setupEventHandlers(): void {
+        const gameInitHandler = () => {
+            this.#changeState(GameStates.INIT);
+        };
+        this.subscribe(GameEvents.GAME_INIT, gameInitHandler);
+        
         const gameStartedHandler = () => {
             this.#changeState(GameStates.START);
         };
-        this.#subscribe(GameEvents.GAME_STARTED, gameStartedHandler);
+        this.subscribe(GameEvents.GAME_STARTED, gameStartedHandler);
 
         const roundStartedHandler = (data: any) => {
             this.#changeState(GameStates.ROUND, data);
         };
-        this.#subscribe(GameEvents.ROUND_STARTED, roundStartedHandler);
+        this.subscribe(GameEvents.ROUND_STARTED, roundStartedHandler);
 
         const roundCompletedHandler = (data: any) => {
             this.#changeState(GameStates.ROUND_RESULT, data);
         };
-        this.#subscribe(GameEvents.ROUND_COMPLETED, roundCompletedHandler);
+        this.subscribe(GameEvents.ROUND_COMPLETED, roundCompletedHandler);
 
         const gameEndHandler = (data: any) => {
             this.#changeState(GameStates.END, data);
         };
-        this.#subscribe(GameEvents.GAME_END, gameEndHandler);
+        this.subscribe(GameEvents.GAME_END, gameEndHandler);
 
         const gameRestartedHandler = () => {
             this.#changeState(GameStates.RESTART);
         };
-        this.#subscribe(GameEvents.GAME_RESTARTED, gameRestartedHandler);
+        this.subscribe(GameEvents.GAME_RESTARTED, gameRestartedHandler);
 
         this.setupCustomEventHandlers();
     }
 
     protected setupCustomEventHandlers(): void { }
 
-    #subscribe(event: string, handler: (...args: any[]) => void): void {
+    protected subscribe(event: string, handler: (...args: any[]) => void): void {
         const eventEmitter = this.scene.app.stage;
+        
+        const oldHandler = this.#eventHandlers.get(event);
+        if (oldHandler) {
+            eventEmitter.off(event, oldHandler);
+        }
+        
         eventEmitter.on(event, handler);
         this.#eventHandlers.set(event, handler);
     }

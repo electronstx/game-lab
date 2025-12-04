@@ -52,6 +52,11 @@ export class RpsGame implements Game {
 
 			this.#gameData = new RpsGameData(GameStates.INIT);
 
+			if (this.#gameflow) {
+				this.#gameflow.cleanupEventHandlers();
+				this.#gameflow = null as any;
+			}
+
 			this.#gameflow = new RpsGameflow(this.#gameData, this.#gameScene);
 
 			this.#scaleManager.onResize((scale, w, h) => {
@@ -112,8 +117,16 @@ export class RpsGame implements Game {
 
 	destroy() {
 		if (this.#app) {
+			if (this.#app.stage) {
+				this.#app.stage.removeAllListeners();
+			}
+
 			if (this.#app.renderer && this.#app.canvas && this.#app.canvas.parentNode) {
 				this.#app.canvas.parentNode.removeChild(this.#app.canvas);
+			}
+
+			if (this.#gameScene) {
+				this.#gameScene.destroy();
 			}
 			
 			if (this.#gameflow) {

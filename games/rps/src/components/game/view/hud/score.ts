@@ -9,6 +9,7 @@ export class Score implements HUDComponent {
     #playerScore?: PIXI.Text;
     #opponentScoreBack?: PIXI.Sprite;
     #opponentScore?: PIXI.Text;
+    #animationCompletedHandler?: (data: RoundResultData) => void;
 
     constructor(scene: RpsScene) {
         this.#scene = scene;
@@ -56,7 +57,8 @@ export class Score implements HUDComponent {
         this.#opponentScore.visible = false;
         this.#scene.addChild(this.#opponentScore);
 
-        this.#scene.app.stage.on('ANIMATION_COMPLETED', this.updateScores.bind(this));
+        this.#animationCompletedHandler = this.updateScores.bind(this);
+        this.#scene.app.stage.on('ANIMATION_COMPLETED', this.#animationCompletedHandler);
     }
 
     show(): void {
@@ -87,4 +89,11 @@ export class Score implements HUDComponent {
 		this.#playerScore && (this.#playerScore.text = '0');
 		this.#opponentScore && (this.#opponentScore.text = '0');
 	}
+
+    destroy(): void {
+        if (this.#animationCompletedHandler) {
+            this.#scene.app.stage.off('ANIMATION_COMPLETED', this.#animationCompletedHandler);
+            this.#animationCompletedHandler = undefined;
+        }
+    }
 }

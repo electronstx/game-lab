@@ -32,6 +32,10 @@ export default class RpsScene extends Scene {
         this.#startScreenAnimation = new StartScreenAnimation(this);
         this.#roundAnimation = new RoundAnimation(this);
         this.#endGameAnimation = new EndGameAnimation(this);
+
+        this.animationManager.registerAnimation(this.#startScreenAnimation);
+        this.animationManager.registerAnimation(this.#roundAnimation);
+        this.animationManager.registerAnimation(this.#endGameAnimation);
     }
 
     override async create(): Promise<void> {
@@ -105,6 +109,6 @@ export default class RpsScene extends Scene {
     }
 
     override restartGame(): void {
-        this.app.stage.emit(GameEvents.GAME_STARTED);
+        this.app.stage.emit(GameEvents.GAME_INIT);
     }
 }

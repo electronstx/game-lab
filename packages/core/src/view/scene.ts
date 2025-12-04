@@ -26,4 +26,9 @@ export default abstract class Scene extends PIXI.Container {
     abstract showRoundResult(...args: any[]): void;
     abstract showEndGame(result: any, timescale?: number): void;
     abstract restartGame(): void;
+
+    destroy(): void {
+        this.animationManager.destroy();
+        this.hud.destroy();
+    }
 }

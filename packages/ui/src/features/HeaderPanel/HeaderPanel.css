@@ -15,14 +15,13 @@
     color: #1565c0;
     font-size: 16px;
     font-weight: 600;
-    min-height: 64px;
+    height: 64px;
     z-index: 1000;
 }
 
 .header-panel-actions {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 12px;
 }
 

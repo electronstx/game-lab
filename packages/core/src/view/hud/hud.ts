@@ -22,4 +22,12 @@ export class HUD {
 	hide(): void {
 		this.#components.forEach((component) => component.hide());
 	}
+
+	destroy(): void {
+		this.#components.forEach((component) => {
+			if (component.destroy) {
+				component.destroy();
+			}
+		});
+	}
 }
