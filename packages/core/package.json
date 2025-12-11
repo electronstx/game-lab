@@ -12,7 +12,7 @@
             "types": "./dist/index.d.ts"
         }
     },
-    "files": [],
+    "files": ["dist"],
     "scripts": {
         "build": "vite build && tsc --emitDeclarationOnly --outDir dist",
         "dev": "vite build --watch",

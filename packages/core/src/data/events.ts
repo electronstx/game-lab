@@ -1,3 +1,10 @@
+export type EventEmitter = {
+    on(event: string, handler: (...args: unknown[]) => void): void;
+    off(event: string, handler: (...args: unknown[]) => void): void;
+    emit(event: string, ...args: unknown[]): void;
+    once?(event: string, handler: (...args: unknown[]) => void): void;
+}
+
 export type GameInitEvent = {
     type: 'GAME_INIT';
     payload?: undefined;
@@ -10,9 +17,7 @@ export type GameStartedEvent = {
 
 export type RoundStartedEvent = {
     type: 'ROUND_STARTED';
-    payload: {
-        roundNumber: number;
-    };
+    payload?: undefined;
 }
 
 export type RoundCompletedEvent = {
@@ -37,6 +42,7 @@ export type GameRestartedEvent = {
 }
 
 export type GameEvent =
+    | GameInitEvent
     | GameStartedEvent
     | RoundStartedEvent
     | RoundCompletedEvent

@@ -2,6 +2,7 @@ import { HUDComponent } from "@parity-games/core";
 import RpsScene from "../rps-scene";
 import * as PIXI from 'pixi.js';
 import { RoundResultData } from "../../data/types";
+import { isRoundResultData } from "../../utils/guards";
 
 export class Score implements HUDComponent {
     #scene: RpsScene;
@@ -9,7 +10,7 @@ export class Score implements HUDComponent {
     #playerScore?: PIXI.Text;
     #opponentScoreBack?: PIXI.Sprite;
     #opponentScore?: PIXI.Text;
-    #animationCompletedHandler?: (data: RoundResultData) => void;
+    #animationCompletedHandler?: (...args: unknown[]) => void;
 
     constructor(scene: RpsScene) {
         this.#scene = scene;
@@ -57,8 +58,13 @@ export class Score implements HUDComponent {
         this.#opponentScore.visible = false;
         this.#scene.addChild(this.#opponentScore);
 
-        this.#animationCompletedHandler = this.updateScores.bind(this);
-        this.#scene.app.stage.on('ANIMATION_COMPLETED', this.#animationCompletedHandler);
+        this.#animationCompletedHandler = (...args: unknown[]) => {
+            const data = args[0];
+            if (isRoundResultData(data)) {
+                this.updateScores(data);
+            }
+        };
+        this.#scene.getEventEmitter().on('ANIMATION_COMPLETED', this.#animationCompletedHandler);
     }
 
     show(): void {
@@ -92,7 +98,7 @@ export class Score implements HUDComponent {
 
     destroy(): void {
         if (this.#animationCompletedHandler) {
-            this.#scene.app.stage.off('ANIMATION_COMPLETED', this.#animationCompletedHandler);
+            this.#scene.getEventEmitter().off('ANIMATION_COMPLETED', this.#animationCompletedHandler);
             this.#animationCompletedHandler = undefined;
         }
     }

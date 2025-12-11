@@ -39,3 +39,7 @@ export function isRpsGameSettings(value: unknown): value is RpsGameSettings {
         settings.bestOf > 0
     );
 }
+
+export function isNumber(value: unknown): value is number {
+    return typeof value === 'number' && !isNaN(value) && isFinite(value);
+}

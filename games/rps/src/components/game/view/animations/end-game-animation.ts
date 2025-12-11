@@ -2,7 +2,7 @@ import { GameAnimation, GameEvents } from '@parity-games/core';
 import gsap from 'gsap';
 import RpsScene from '../rps-scene';
 import * as PIXI from 'pixi.js';
-import { playClickSound, playEndGameSound } from '../../sounds';
+import { playEndGameSound } from '../../sounds';
 import { isGameResult } from '../../utils/guards';
 
 export class EndGameAnimation implements GameAnimation {
@@ -77,7 +77,7 @@ export class EndGameAnimation implements GameAnimation {
 
         if (!this.#end || !this.#endText || !isGameResult(text)) return;
 
-		playEndGameSound(text);
+		playEndGameSound(this.#scene.soundService, text);
 
 		this.#end.visible = true;
 		this.#endText.text = `${text}`;
@@ -100,7 +100,7 @@ export class EndGameAnimation implements GameAnimation {
 
 		this.#autoRestartTimeout = setTimeout(() => {
 			this.reset();
-			this.#scene.app.stage.emit(GameEvents.GAME_RESTARTED);
+			this.#scene.getEventEmitter().emit(GameEvents.GAME_RESTARTED);
 		}, 5000);
 	}
 

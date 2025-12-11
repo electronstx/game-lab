@@ -61,7 +61,7 @@ export class BowlingPhysicsService {
             
             this.#pinManager.update();
         } else if (wasMoving) {
-            this.#scene.app.stage.emit('BALL_STOPPED');
+            this.#scene.getEventEmitter().emit('BALL_STOPPED');
         }
         
         if (!ballStillMoving) {
@@ -70,7 +70,7 @@ export class BowlingPhysicsService {
     }
 
     onBallLaunched(): void {
-        this.#scene.app.stage.emit('BALL_LAUNCHED');
+        this.#scene.getEventEmitter().emit('BALL_LAUNCHED');
     }
 
     onBallStopped(): void {
@@ -79,7 +79,7 @@ export class BowlingPhysicsService {
                 const currentPinsKnockedDown = this.#pinManager.getKnockedDownCount();
                 const pinsKnockedDown = currentPinsKnockedDown - this.#pinsBeforeThrow;
                 
-                this.#scene.app.stage.emit('PINS_SETTLED', {
+                this.#scene.getEventEmitter().emit('PINS_SETTLED', {
                     pinsKnockedDown: pinsKnockedDown,
                     totalKnockedDown: currentPinsKnockedDown
                 });

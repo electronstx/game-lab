@@ -13,7 +13,7 @@ export default class BowlingGameflow extends Gameflow {
         this.#scene = scene;
     }
 
-    override setGameSettings(gameSettings: any): void {
+    override setGameSettings(gameSettings: unknown): void {
         if (isBowlingGameSettings(gameSettings)) {
             this.gameData.setGameSettings(gameSettings);
             (this.gameData as BowlingGameData).initializeFrames();
@@ -27,12 +27,11 @@ export default class BowlingGameflow extends Gameflow {
         this.#updateScoreboard();
     }
 
-    override startRound(roundNumber: number): void {
+    override startRound(): void {
         const gameData = this.gameData as BowlingGameData;
-        const currentPlayer = gameData.getCurrentPlayer();
         const shouldResetAllPins = gameData.shouldResetAllPins();
         
-        this.#scene.showRound(roundNumber, currentPlayer, shouldResetAllPins); 
+        this.#scene.showRound(undefined, undefined, shouldResetAllPins); 
         
         this.#updateScoreboard();
         
@@ -40,41 +39,41 @@ export default class BowlingGameflow extends Gameflow {
         this.#ballWasLaunched = false;
     }
 
-    override showRoundResult(...args: any[]): void {
+    override showRoundResult(...args: unknown[]): void {
         const resultData = args[0];
         const gameData = this.gameData as BowlingGameData;
         
-        if (resultData && resultData.pinsKnockedDown !== undefined) {
+        if (resultData && typeof resultData === 'object' && 'pinsKnockedDown' in resultData) {
             if (!gameData.canProcessThrowResult()) {
                 return;
             }
             
-            gameData.setThrowResult(resultData.pinsKnockedDown);
+            gameData.setThrowResult((resultData as { pinsKnockedDown: number }).pinsKnockedDown);
             
             const endGameResult = gameData.checkEndGame();
             if (endGameResult) {
-                this.#scene.showRoundResult(this.gameData.getRoundResultData());
+                this.scene.showRoundResult(this.gameData.getRoundResultData());
                 this.#updateScoreboard();
                 this.#scene.stopGameLoop();
                 setTimeout(() => {
-                    this.#scene.app.stage.emit(GameEvents.GAME_END, endGameResult);
+                    this.emit(GameEvents.GAME_END, endGameResult);
                 }, 2000);
                 return;
             }
             
-            this.#scene.showRoundResult(this.gameData.getRoundResultData());
+            this.scene.showRoundResult(this.gameData.getRoundResultData());
             this.#updateScoreboard();
             
             setTimeout(() => {
-                this.#scene.app.stage.emit(GameEvents.ROUND_STARTED);
+                this.emit(GameEvents.ROUND_STARTED);
             }, 2000);
         } else {
-            this.#scene.showRoundResult(this.gameData.getRoundResultData());
+            this.scene.showRoundResult(this.gameData.getRoundResultData());
             this.#updateScoreboard();
         }
     }
 
-    override showEndGame(result: any, timescale?: number): void {
+    override showEndGame(result: unknown, timescale?: number): void {
         this.#scene.stopGameLoop();
         this.#scene.showEndGame(result, timescale);
         this.#updateScoreboard();
@@ -93,9 +92,9 @@ export default class BowlingGameflow extends Gameflow {
     }
 
     protected override setupCustomEventHandlers(): void {
-        const userInputHandler = (data: { angle: number }) => {
-            if (!this.#ballWasLaunched) {
-                this.#scene.launchBall(data.angle);
+        const userInputHandler = (data: unknown) => {
+            if (!this.#ballWasLaunched && typeof data === 'object' && data !== null && 'angle' in data) {
+                this.#scene.launchBall((data as { angle: number }).angle);
             }
         };
         this.subscribe('USER_INPUT_BALL_LAUNCH', userInputHandler);
@@ -113,17 +112,19 @@ export default class BowlingGameflow extends Gameflow {
         };
         this.subscribe('BALL_LAUNCHED', ballLaunchedHandler);
         
-        const pinsSettledHandler = (data: { pinsKnockedDown: number, totalKnockedDown: number }) => {
+        const pinsSettledHandler = (data: unknown) => {
             if (this.#roundCompletedEmitted) {
                 return;
             }
             
-            this.#roundCompletedEmitted = true;
-            this.#ballWasLaunched = false;
-            
-            this.#scene.app.stage.emit(GameEvents.ROUND_COMPLETED, {
-                pinsKnockedDown: data.pinsKnockedDown
-            });
+            if (typeof data === 'object' && data !== null && 'pinsKnockedDown' in data) {
+                this.#roundCompletedEmitted = true;
+                this.#ballWasLaunched = false;
+                
+                this.emit(GameEvents.ROUND_COMPLETED, {
+                    pinsKnockedDown: (data as { pinsKnockedDown: number }).pinsKnockedDown
+                });
+            }
         };
         this.subscribe('PINS_SETTLED', pinsSettledHandler);
     }

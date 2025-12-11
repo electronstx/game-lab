@@ -4,6 +4,8 @@ export { GameStates, type GameStateName } from './data/types.js';
 
 // Events
 export type {
+    EventEmitter,
+    GameInitEvent,
     GameStartedEvent,
     RoundStartedEvent,
     RoundCompletedEvent,
@@ -27,5 +29,5 @@ export { GameObjects } from './view/game-objects/game-objects.js';
 export type { GameObject } from './view/game-objects/types.js';
 
 // Services
-export { soundService } from './services/sound/sound-service.js';
-export type { SoundSettingsState } from './services/sound/types.js';
+export { SoundService } from './services/sound/sound-service.js';
+export type { SoundSettingsState, SoundConfig, SoundKey, SoundType } from './services/sound/types.js';

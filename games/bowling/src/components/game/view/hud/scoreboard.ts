@@ -249,7 +249,7 @@ export class Scoreboard implements HUDComponent {
                 
                 if (texts.throw1) {
                     if (hasData || isCurrentFrame) {
-                        texts.throw1.text = this.#formatThrow(frame.throw1, frame.isStrike);
+                        texts.throw1.text = this.#formatThrow(frame.throw1, frame.isStrike, false);
                     } else {
                         texts.throw1.text = '';
                     }
@@ -262,9 +262,9 @@ export class Scoreboard implements HUDComponent {
                             const isStrikeOnThrow2 = frame.throw1 === 10 && frame.throw2 === 10;
                             const isSpareOnThrow2 = frame.throw1 !== null && frame.throw1 !== 10 && 
                                                    frame.throw2 !== null && (frame.throw1 + frame.throw2 === 10);
-                            texts.throw2.text = this.#formatThrow(frame.throw2, isStrikeOnThrow2 || isSpareOnThrow2);
+                            texts.throw2.text = this.#formatThrow(frame.throw2, isStrikeOnThrow2, isSpareOnThrow2);
                         } else {
-                            texts.throw2.text = this.#formatThrow(frame.throw2, frame.isSpare && !frame.isStrike);
+                            texts.throw2.text = this.#formatThrow(frame.throw2, false, frame.isSpare && !frame.isStrike);
                         }
                     } else {
                         texts.throw2.text = '';
@@ -273,7 +273,7 @@ export class Scoreboard implements HUDComponent {
                 
                 if (texts.throw3 && index === this.#numberOfFrames - 1) {
                     const isStrikeOnThrow3 = frame.throw3 === 10;
-                    texts.throw3.text = this.#formatThrow(frame.throw3, isStrikeOnThrow3);
+                    texts.throw3.text = this.#formatThrow(frame.throw3, isStrikeOnThrow3, false);
                 }
 
                 if (texts.score) {
@@ -294,7 +294,7 @@ export class Scoreboard implements HUDComponent {
                 
                 if (texts.throw1) {
                     if (hasData || isCurrentFrame) {
-                        texts.throw1.text = this.#formatThrow(frame.throw1, frame.isStrike);
+                        texts.throw1.text = this.#formatThrow(frame.throw1, frame.isStrike, false);
                     } else {
                         texts.throw1.text = '';
                     }
@@ -307,9 +307,9 @@ export class Scoreboard implements HUDComponent {
                             const isStrikeOnThrow2 = frame.throw1 === 10 && frame.throw2 === 10;
                             const isSpareOnThrow2 = frame.throw1 !== null && frame.throw1 !== 10 && 
                                                    frame.throw2 !== null && (frame.throw1 + frame.throw2 === 10);
-                            texts.throw2.text = this.#formatThrow(frame.throw2, isStrikeOnThrow2 || isSpareOnThrow2);
+                            texts.throw2.text = this.#formatThrow(frame.throw2, isStrikeOnThrow2, isSpareOnThrow2);
                         } else {
-                            texts.throw2.text = this.#formatThrow(frame.throw2, frame.isSpare && !frame.isStrike);
+                            texts.throw2.text = this.#formatThrow(frame.throw2, false, frame.isSpare && !frame.isStrike);
                         }
                     } else {
                         texts.throw2.text = '';
@@ -318,7 +318,7 @@ export class Scoreboard implements HUDComponent {
                 
                 if (texts.throw3 && index === this.#numberOfFrames - 1) {
                     const isStrikeOnThrow3 = frame.throw3 === 10;
-                    texts.throw3.text = this.#formatThrow(frame.throw3, isStrikeOnThrow3);
+                    texts.throw3.text = this.#formatThrow(frame.throw3, isStrikeOnThrow3, false);
                 }
 
                 if (texts.score) {
@@ -363,12 +363,12 @@ export class Scoreboard implements HUDComponent {
         }
     }
 
-    #formatThrow(value: number | null, isSpecial: boolean): string {
+    #formatThrow(value: number | null, isStrike: boolean = false, isSpare: boolean = false): string {
         if (value === null) return '';
-        if (isSpecial && value === 10) {
+        if (isStrike && value === 10) {
             return 'X';
         }
-        if (isSpecial && value !== 10) {
+        if (isSpare) {
             return '/';
         }
         if (value === 0) return '0';

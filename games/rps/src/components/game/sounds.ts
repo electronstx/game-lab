@@ -1,6 +1,6 @@
-import { soundService } from '@parity-games/core';
+import { SoundService } from '@parity-games/core';
 
-export function initGameSounds() {
+export function initGameSounds(soundService: SoundService) {
 	soundService.registerMusic('bgMusic', {
 		src: '/assets/sounds/music-loop.mp3',
 		loop: true,
@@ -37,19 +37,19 @@ export function initGameSounds() {
 	}
 }
 
-export function playClickSound() {
+export function playClickSound(soundService: SoundService) {
 	soundService.play('click');
 }
 
-export function playHoverSound() {
+export function playHoverSound(soundService: SoundService) {
 	soundService.play('hover');
 }
 
-export function playFlashSound() {
+export function playFlashSound(soundService: SoundService) {
 	soundService.play('flash');
 }
 
-export function playEndGameSound(result: string) {
+export function playEndGameSound(soundService: SoundService, result: string) {
 	const soundName = result === 'Player wins!' ? 'end-game-win' : 'end-game-lose';
 	soundService.play(soundName);
 }

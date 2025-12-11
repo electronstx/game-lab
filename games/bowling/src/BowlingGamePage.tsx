@@ -2,10 +2,19 @@ import { CreateForm, FooterPanel, GameContainer, HeaderPanel, SoundSettings } fr
 import { useSoundSettings } from "./utils/hooks/useSoundSettings.js";
 import { useBowlingGame } from "./utils/hooks/useBowlingGame.js";
 import { BowlingGameSettings } from "./components/ui/features/BowlingGameSettings/BowlingGameSettings.js";
+import { SoundService } from "@parity-games/core";
+import { useEffect, useMemo } from "react";
 
 export const BowlingGamePage = () => {
-    const { soundSettings, toggleSound, toggleMusic } = useSoundSettings();
-    const { createGame, startGame, isGameStarted } = useBowlingGame();
+    const soundService = useMemo(() => new SoundService(), []);
+    const { soundSettings, toggleSound, toggleMusic } = useSoundSettings(soundService);
+    const { createGame, startGame, isGameStarted } = useBowlingGame(soundService);
+
+    useEffect(() => {
+        return () => {
+            soundService.cleanup();
+        };
+    }, [soundService]);
 
     return (
         <>

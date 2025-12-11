@@ -1,4 +1,4 @@
-import { GameEvents, Scene } from '@parity-games/core';
+import { GameEvents, Scene, SoundService } from '@parity-games/core';
 import * as PIXI from 'pixi.js';
 import { Score } from './hud/score';
 import { ChoicePanel } from './hud/choice-panel';
@@ -17,8 +17,8 @@ export default class RpsScene extends Scene {
     #roundAnimation: RoundAnimation;
     #endGameAnimation: EndGameAnimation;
 
-    constructor(app: PIXI.Application, scale: number) {
-        super(app, scale);
+    constructor(app: PIXI.Application, soundService: SoundService, scale: number) {
+        super(app, soundService, scale);
 
         this.#score = new Score(this);
         this.hud.addComponent(this.#score);
@@ -84,7 +84,7 @@ export default class RpsScene extends Scene {
 
     override showStartGame(): void {
         this.animationManager.reset();
-        this.app.stage.emit(GameEvents.ROUND_STARTED);
+        this.getEventEmitter().emit(GameEvents.ROUND_STARTED);
     }
 
     override showRound(roundNumber: number): void {
@@ -109,6 +109,6 @@ export default class RpsScene extends Scene {
     }
 
     override restartGame(): void {
-        this.app.stage.emit(GameEvents.GAME_INIT);
+        this.getEventEmitter().emit(GameEvents.GAME_INIT);
     }
 }

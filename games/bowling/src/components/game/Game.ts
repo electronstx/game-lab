@@ -4,7 +4,7 @@ import { IBowlingScene } from './view/types.js';
 import BowlingGameData from './data/bowling-game-data.js';
 import BowlingGameflow from './flow/bowling-gameflow.js';
 import { ScaleManager } from "./utils/scale.js";
-import { GameEvents, GameStates, soundService } from '@parity-games/core';
+import { GameEvents, GameStates, SoundService } from '@parity-games/core';
 import { Game } from '@parity-games/ui';
 import { BowlingGameSettings } from './types.js';
 
@@ -17,6 +17,11 @@ export class BowlingGame implements Game {
     #scaleManager!: ScaleManager;
     #isInitializing: boolean = false;
     #abortController: AbortController | null = null;
+    #soundService: SoundService;
+
+	constructor(soundService: SoundService) {
+		this.#soundService = soundService;
+	}
 
     async init(parent: HTMLDivElement) {
         if (this.#app && this.#gameScene && this.#app.renderer) {
@@ -65,7 +70,7 @@ export class BowlingGame implements Game {
     
                 this.#scaleManager = new ScaleManager(this.#app, parent, 1280, 768, 'contain');
     
-                this.#gameScene = new BowlingScene(this.#app, this.#scaleManager.scale);
+                this.#gameScene = new BowlingScene(this.#app, this.#soundService, this.#scaleManager.scale);
                 this.#app.stage.addChild(this.#gameScene);
                 await this.#gameScene.create();
     
@@ -153,29 +158,29 @@ export class BowlingGame implements Game {
 
     async emit(event: string, payload?: unknown) {
         const scene = await this.whenReady;
-        if (scene?.app) {
-            scene.app.stage.emit(event, payload);
+        if (scene) {
+            scene.getEventEmitter().emit(event, payload);
         }
     }
 
     async on(event: string, listener: (event: unknown) => void): Promise<void> {
         const scene = await this.whenReady;
-        if (scene?.app) {
-            scene.app.stage.on(event, listener);
+        if (scene) {
+            scene.getEventEmitter().on(event, listener);
         }
     }
 
     async once(event: string, listener: (event: unknown) => void): Promise<void> {
         const scene = await this.whenReady;
-        if (scene?.app) {
-            scene.app.stage.once(event, listener);
+        if (scene) {
+            scene.getEventEmitter().on(event, listener);
         }
     }
 
     async off(event: string, listener: (event: unknown) => void): Promise<void> {
         const scene = await this.whenReady;
-        if (scene?.app) {
-            scene.app.stage.off(event, listener);
+        if (scene) {
+            scene.getEventEmitter().off(event, listener);
         }
     }
 
@@ -188,33 +193,33 @@ export class BowlingGame implements Game {
         this.#isInitializing = false;
         
         if (this.#app) {
-            if (this.#app.stage) {
-                this.#app.stage.removeAllListeners();
-            }
-    
-            if (this.#app.renderer && this.#app.canvas && this.#app.canvas.parentNode) {
-                this.#app.canvas.parentNode.removeChild(this.#app.canvas);
-            }
-    
-            if (this.#gameScene) {
-                this.#gameScene.destroy();
-            }
-            
-            if (this.#gameflow) {
-                this.#gameflow.cleanupEventHandlers();
-            }
-            
-            if (this.#scaleManager) {
-                this.#scaleManager.cleanup();
-            }
-            
-            soundService.cleanup();
-    
-            if (this.#app.renderer) {
-                this.#app.destroy(true);
-            }
-            this.#app = null as any;
-        }
+			if (this.#gameflow) {
+				this.#gameflow.destroy();
+			}
+
+			if (this.#gameScene) {
+				this.#gameScene.destroy();
+			}
+
+			if (this.#app.renderer && this.#app.canvas && this.#app.canvas.parentNode) {
+				this.#app.canvas.parentNode.removeChild(this.#app.canvas);
+			}
+
+			if (this.#scaleManager) {
+				this.#scaleManager.cleanup();
+			}
+			
+			this.#soundService.cleanup();
+
+			if (this.#app.stage) {
+				this.#app.stage.removeAllListeners();
+			}
+
+			if (this.#app.renderer) {
+				this.#app.destroy(true);
+			}
+			this.#app = null as any;
+		}
         
         this.#gameScene = null as any;
         this.#gameData = null as any;

@@ -1,16 +1,19 @@
-import { GameEvents } from "../data/events.js";
+import { GameEndEvent, GameEvents, EventEmitter, RoundCompletedEvent, RoundStartedEvent } from "../data/events.js";
 import GameData from "../data/game-data.js";
-import { GameStateName, GameStates } from "../data/types.js";
+import { GameStateName, GameStates, StateEnterData } from "../data/types.js";
+import { isGameEndEvent, isRoundCompletedEvent } from "../utils/guards.js";
 import Scene from "../view/scene.js";
 
 export default abstract class Gameflow {
     protected gameData: GameData;
     protected scene: Scene;
-    #eventHandlers: Map<string, (...args: any[]) => void> = new Map();
+    #eventHandlers: Map<string, (...args: unknown[]) => void> = new Map();
+    #eventEmitter: EventEmitter;
 
     constructor(gameData: GameData, scene: Scene) {
         this.gameData = gameData;
         this.scene = scene;
+        this.#eventEmitter = scene.getEventEmitter();
 
         this.#setupEventHandlers();
         this.#enterState(this.gameData.getCurrentState());
@@ -24,15 +27,15 @@ export default abstract class Gameflow {
         this.startGame();
     }
 
-    protected onEnterRound(roundNumber: number): void {
-        this.startRound(roundNumber);
+    protected onEnterRound(): void {
+        this.startRound();
     }
 
-    protected onEnterRoundResult(resultData?: any): void {
+    protected onEnterRoundResult(resultData?: unknown): void {
         this.showRoundResult(resultData);
     }
 
-    protected onEnterEnd(result?: any, timescale?: number): void {
+    protected onEnterEnd(result?: unknown, timescale?: number): void {
         this.showEndGame(result, timescale);
     }
 
@@ -40,7 +43,7 @@ export default abstract class Gameflow {
         this.restartGame();
     }
 
-    #enterState(stateName: GameStateName, ...args: any[]): void {
+    #enterState(stateName: GameStateName, data?: StateEnterData): void {
         switch (stateName) {
             case GameStates.INIT:
                 this.onEnterInit();
@@ -49,13 +52,13 @@ export default abstract class Gameflow {
                 this.onEnterStart();
                 break;
             case GameStates.ROUND:
-                this.onEnterRound(args[0] as number);
+                this.onEnterRound();
                 break;
             case GameStates.ROUND_RESULT:
-                this.onEnterRoundResult(args[0]);
+                this.onEnterRoundResult(data?.resultData);
                 break;
             case GameStates.END:
-                this.onEnterEnd(args[0], args[1]);
+                this.onEnterEnd(data?.result, data?.timescale);
                 break;
             case GameStates.RESTART:
                 this.onEnterRestart();
@@ -63,9 +66,9 @@ export default abstract class Gameflow {
         }
     }
 
-    #changeState(newState: GameStateName, ...args: any[]): void {
-        this.gameData.changeState(newState, { args });        
-        this.#enterState(newState, ...args);
+    #changeState(newState: GameStateName, data?: StateEnterData): void {
+        this.gameData.changeState(newState, data ? { stateData: data } : undefined);        
+        this.#enterState(newState, data);
     }
 
     #setupEventHandlers(): void {
@@ -79,18 +82,48 @@ export default abstract class Gameflow {
         };
         this.subscribe(GameEvents.GAME_STARTED, gameStartedHandler);
 
-        const roundStartedHandler = (data: any) => {
-            this.#changeState(GameStates.ROUND, data);
+        const roundStartedHandler = () => {
+            this.#changeState(GameStates.ROUND);
         };
         this.subscribe(GameEvents.ROUND_STARTED, roundStartedHandler);
-
-        const roundCompletedHandler = (data: any) => {
-            this.#changeState(GameStates.ROUND_RESULT, data);
+        
+        const roundCompletedHandler = (...args: unknown[]) => {
+            const data = args[0];
+            
+            if (isRoundCompletedEvent(data)) {
+                this.#changeState(GameStates.ROUND_RESULT, { resultData: data.payload });
+                return;
+            }
+            
+            if (typeof data === 'string' || (typeof data === 'object' && data !== null)) {
+                const roundNumber = this.gameData.getRoundData();
+                this.#changeState(GameStates.ROUND_RESULT, { 
+                    resultData: typeof data === 'string' 
+                        ? { playerMove: data, roundNumber } 
+                        : { ...data, roundNumber }
+                });
+                return;
+            }
         };
         this.subscribe(GameEvents.ROUND_COMPLETED, roundCompletedHandler);
-
-        const gameEndHandler = (data: any) => {
-            this.#changeState(GameStates.END, data);
+        
+        const gameEndHandler = (...args: unknown[]) => {
+            const data = args[0];
+            
+            if (isGameEndEvent(data)) {
+                const payload = data.payload && typeof data.payload === 'object' ? data.payload : {};
+                this.#changeState(GameStates.END, { 
+                    result: 'result' in payload ? payload.result : data,
+                    timescale: 'timescale' in payload && typeof payload.timescale === 'number' 
+                        ? payload.timescale 
+                        : undefined
+                });
+                return;
+            }
+            
+            if (data !== undefined) {
+                this.#changeState(GameStates.END, { result: data });
+            }
         };
         this.subscribe(GameEvents.GAME_END, gameEndHandler);
 
@@ -104,30 +137,41 @@ export default abstract class Gameflow {
 
     protected setupCustomEventHandlers(): void { }
 
-    protected subscribe(event: string, handler: (...args: any[]) => void): void {
-        const eventEmitter = this.scene.app.stage;
-        
+    protected subscribe(event: string, handler: (...args: unknown[]) => void): void {   
         const oldHandler = this.#eventHandlers.get(event);
         if (oldHandler) {
-            eventEmitter.off(event, oldHandler);
+            this.#eventEmitter.off(event, oldHandler);
         }
         
-        eventEmitter.on(event, handler);
+        this.#eventEmitter.on(event, handler);
         this.#eventHandlers.set(event, handler);
     }
 
+    protected emit(event: string, ...args: unknown[]): void {
+        if (!this.#eventEmitter) return;
+        
+        this.#eventEmitter.emit(event, ...args);
+    }
+
     cleanupEventHandlers(): void {
-        const eventEmitter = this.scene.app.stage;
         for (const [event, handler] of this.#eventHandlers) {
-            eventEmitter.off(event, handler);
+            this.#eventEmitter.off(event, handler);
         }
         this.#eventHandlers.clear();
     }
 
-    abstract setGameSettings(gameSettings: any): void;
+    destroy(): void {
+        this.cleanupEventHandlers();
+
+        this.#eventEmitter = null as unknown as EventEmitter;
+        this.gameData = null as unknown as GameData;
+        this.scene = null as unknown as Scene;
+    }
+
+    abstract setGameSettings(gameSettings: unknown): void;
     abstract startGame(): void;
-    abstract startRound(roundNumber: number): void;
-    abstract showRoundResult(...args: any[]): void;
-    abstract showEndGame(result: any, timescale?: number): void;
+    abstract startRound(): void;
+    abstract showRoundResult(...args: unknown[]): void;
+    abstract showEndGame(result: unknown, timescale?: number): void;
     abstract restartGame(): void;
 }

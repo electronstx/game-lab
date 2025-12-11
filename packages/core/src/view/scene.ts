@@ -2,37 +2,95 @@ import * as PIXI from 'pixi.js';
 import { HUD } from './hud/hud.js';
 import { AnimationManager } from './animations/animation-manager.js';
 import { GameObjects } from './game-objects/game-objects.js';
+import { EventEmitter } from '../data/events.js';
+import { SoundService } from '../services/sound/sound-service.js';
 
 export default abstract class Scene extends PIXI.Container {
     app: PIXI.Application;
     gameScale: number;
 
+    #soundService: SoundService;
+    #eventEmitterAdapter: EventEmitter | null = null;
     protected animationManager: AnimationManager;
     protected hud: HUD;
     protected gameObjects: GameObjects;
 
-    constructor(app: PIXI.Application, scale: number) {
+    constructor(app: PIXI.Application, soundService: SoundService, scale: number) {
         super();
         this.app = app;
         this.gameScale = scale;
+        this.#soundService = soundService;
         this.animationManager = new AnimationManager();
         this.hud = new HUD();
         this.gameObjects = new GameObjects();
     }
 
+    getEventEmitter(): EventEmitter {
+        if (this.#eventEmitterAdapter) {
+            return this.#eventEmitterAdapter;
+        }
+        
+        const stage = this.app.stage;
+        
+        if (
+            typeof stage.on === 'function' &&
+            typeof stage.off === 'function' &&
+            typeof stage.emit === 'function'
+        ) {
+            this.#eventEmitterAdapter = {
+                on: (event: string, handler: (...args: unknown[]) => void) => {
+                    stage.on(event, handler);
+                },
+                off: (event: string, handler: (...args: unknown[]) => void) => {
+                    stage.off(event, handler);
+                },
+                emit: (event: string, ...args: unknown[]) => {
+                    stage.emit(event, ...args);
+                },
+                once: (event: string, handler: (...args: unknown[]) => void) => {
+                    if (typeof stage.once === 'function') {
+                        stage.once(event, handler);
+                    } else {
+                        const onceHandler = (...args: unknown[]) => {
+                            handler(...args);
+                            stage.off(event, onceHandler);
+                        };
+                        stage.on(event, onceHandler);
+                    }
+                }
+            };
+            
+            return this.#eventEmitterAdapter;
+        }
+        
+        throw new Error('PIXI.Application stage does not implement EventEmitter interface');
+    }
+
+    get soundService(): SoundService {
+        return this.#soundService;
+    }
+
     abstract create(): void;
     abstract onResize(scale: number, width: number, height: number): void;
     abstract showStartScreen(): void;
-    abstract initHUD(...args: any[]): void;
+    abstract initHUD(...args: unknown[]): void;
     abstract showStartGame(timescale?: number): void;
-    abstract showRound(roundNumber: number, timescale?: number, ...args: any[]): void;
-    abstract showRoundResult(...args: any[]): void;
-    abstract showEndGame(result: any, timescale?: number): void;
+    abstract showRound(roundNumber?: number, timescale?: number, ...args: unknown[]): void;
+    abstract showRoundResult(...args: unknown[]): void;
+    abstract showEndGame(result: unknown, timescale?: number): void;
     abstract restartGame(): void;
 
     destroy(): void {
         this.animationManager.destroy();
         this.hud.destroy();
         this.gameObjects.destroy();
+
+        if (this.#eventEmitterAdapter) {
+            this.#eventEmitterAdapter = null;
+        }
+
+        this.#soundService = null as unknown as SoundService;
+        
+        super.destroy();
     }
 }

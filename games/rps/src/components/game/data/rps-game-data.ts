@@ -1,5 +1,6 @@
 import { GameData, GameStateName } from "@parity-games/core";
 import { RoundResultData } from "./types";
+import { isNumber } from "../utils/guards";
 
 export default class RpsGameData extends GameData {
     #playerScore: number = 0;
@@ -51,7 +52,6 @@ export default class RpsGameData extends GameData {
 
     checkRoundResult(playerMove: string, opponentMove: string): 'player' | 'opponent' | 'tie' {
         if (playerMove === opponentMove) {
-            this.#roundNumber++;
             return 'tie';
         }
     
@@ -69,7 +69,11 @@ export default class RpsGameData extends GameData {
     }
 
     checkEndGame(): string | null {
-        const winsNeeded = Math.ceil(this.gameSettings.bestOf / 2);
+        const bestOf = this.gameSettings.bestOf;
+
+        if (!isNumber(bestOf)) return null;
+
+        const winsNeeded = Math.ceil(bestOf / 2);
 
         return this.#playerScore === winsNeeded ? 'Player wins!'
             : this.#opponentScore === winsNeeded ? 'Opponent wins!'

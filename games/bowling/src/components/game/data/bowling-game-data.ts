@@ -1,5 +1,6 @@
 import { GameData, GameStateName } from "@parity-games/core";
 import { ThrowResult, Frame, ScoreboardData } from "./types.js";
+import { isBowlingGameSettings } from "../utils/guards.js";
 
 export default class BowlingGameData extends GameData {
     #player1Score: number = 0;
@@ -16,8 +17,16 @@ export default class BowlingGameData extends GameData {
         super(initialState);
     }
 
+    #getNumberOfFrames(): number {
+        if (isBowlingGameSettings(this.gameSettings)) {
+            return this.gameSettings.numberOfFrames;
+        }
+        return 10;
+    }
+
     initializeFrames(): void {
-        this.#player1Frames = Array.from({ length: this.gameSettings.numberOfFrames }, () => ({
+        const numberOfFrames = this.#getNumberOfFrames();
+        this.#player1Frames = Array.from({ length: numberOfFrames }, () => ({
             throw1: null,
             throw2: null,
             throw3: null,
@@ -25,7 +34,7 @@ export default class BowlingGameData extends GameData {
             isStrike: false,
             isSpare: false
         }));
-        this.#player2Frames = Array.from({ length: this.gameSettings.numberOfFrames }, () => ({
+        this.#player2Frames = Array.from({ length: numberOfFrames }, () => ({
             throw1: null,
             throw2: null,
             throw3: null,
@@ -37,7 +46,7 @@ export default class BowlingGameData extends GameData {
 
     override getGameData(): { numberOfFrames: number, playerScore: number, opponentScore: number } {
         return { 
-            numberOfFrames: this.gameSettings.numberOfFrames, 
+            numberOfFrames: this.#getNumberOfFrames(), 
             playerScore: this.#player1Score, 
             opponentScore: this.#player2Score 
         };
@@ -129,16 +138,17 @@ export default class BowlingGameData extends GameData {
     }
 
     #isLastFrame(): boolean {
-        return this.#currentFrame === this.gameSettings.numberOfFrames - 1;
+        return this.#currentFrame === this.#getNumberOfFrames() - 1;
     }
 
     #isLastFrameIndex(frameIndex: number): boolean {
-        return frameIndex === this.gameSettings.numberOfFrames - 1;
+        return frameIndex === this.#getNumberOfFrames() - 1;
     }
 
     #isFrameCompleted(frame: Frame, frameIndex?: number): boolean {
+        const numberOfFrames = this.#getNumberOfFrames();
         const isLastFrame = frameIndex !== undefined 
-            ? frameIndex === this.gameSettings.numberOfFrames - 1
+            ? frameIndex === numberOfFrames - 1
             : this.#isLastFrame();
         
         if (!isLastFrame) {
@@ -167,6 +177,8 @@ export default class BowlingGameData extends GameData {
         const frame = frames[frameIndex];
         if (!frame) return;
 
+        const numberOfFrames = this.#getNumberOfFrames();
+
         if (this.#isLastFrameIndex(frameIndex)) {
             let score = 0;
             if (frame.throw1 !== null) score += frame.throw1;
@@ -185,7 +197,7 @@ export default class BowlingGameData extends GameData {
 
         if (frame.isStrike) {
             if (nextFrame.isStrike) {
-                const isSecondToLastFrame = frameIndex === this.gameSettings.numberOfFrames - 2;
+                const isSecondToLastFrame = frameIndex === numberOfFrames - 2;
                 if (!isSecondToLastFrame) {
                     const nextNextFrame = frames[frameIndex + 2];
                     if (nextNextFrame && nextNextFrame.throw1 !== null) {
@@ -250,7 +262,8 @@ export default class BowlingGameData extends GameData {
     }
 
     checkEndGame(): string | null {
-        const lastFrameIndex = this.gameSettings.numberOfFrames - 1;
+        const numberOfFrames = this.#getNumberOfFrames();
+        const lastFrameIndex = numberOfFrames - 1;
         const player1LastFrame = this.#player1Frames[lastFrameIndex];
         const player2LastFrame = this.#player2Frames[lastFrameIndex];
         

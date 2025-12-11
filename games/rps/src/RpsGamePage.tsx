@@ -2,10 +2,19 @@ import { CreateForm, FooterPanel, GameContainer, HeaderPanel, SoundSettings } fr
 import { RpsGameSettings } from "./components/ui/features/RpsGameSettings/RpsGameSettings.js";
 import { useSoundSettings } from "./utils/hooks/useSoundSettings.js";
 import { useRpsGame } from "./utils/hooks/useRpsGame.js";
+import { SoundService } from "@parity-games/core";
+import { useEffect, useMemo } from "react";
 
 export const RpsGamePage = () => {
-    const { soundSettings, toggleSound, toggleMusic } = useSoundSettings();
-    const { createGame, startGame, isGameStarted } = useRpsGame();
+    const soundService = useMemo(() => new SoundService(), []);
+    const { soundSettings, toggleSound, toggleMusic } = useSoundSettings(soundService);
+    const { createGame, startGame, isGameStarted } = useRpsGame(soundService);
+
+    useEffect(() => {
+        return () => {
+            soundService.cleanup();
+        };
+    }, [soundService]);
 
     return (
         <>

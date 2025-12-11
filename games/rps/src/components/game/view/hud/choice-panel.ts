@@ -40,11 +40,11 @@ export class ChoicePanel implements HUDComponent {
             choice.cursor = 'pointer';
             choice.on('pointerdown', () => {
                 this.hide();
-                playClickSound();
-                this.#scene.app.stage.emit(GameEvents.ROUND_COMPLETED, config.name);
+                playClickSound(this.#scene.soundService);
+                this.#scene.getEventEmitter().emit(GameEvents.ROUND_COMPLETED, config.name);
             });
             choice.on('pointerenter', () => {
-                playHoverSound();
+                playHoverSound(this.#scene.soundService);
                 choice.tint = 0xFFFFFF;
             });
             choice.on('pointerleave', () => {

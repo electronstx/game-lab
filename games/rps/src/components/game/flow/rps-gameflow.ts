@@ -1,13 +1,13 @@
 import { Gameflow, GameData, Scene, GameEvents } from "@parity-games/core";
 import RpsGameData from "../data/rps-game-data";
-import { isRoundResultData, isRpsGameSettings } from "../utils/guards";
+import { isRoundResultData, isRpsGameSettings, isRpsMove } from "../utils/guards";
 
 export default class RpsGameflow extends Gameflow{
     constructor(gameData: GameData, scene: Scene) {
         super(gameData, scene);
     }
 
-    override setGameSettings(gameSettings: any): void {
+    override setGameSettings(gameSettings: unknown): void {
         if (isRpsGameSettings(gameSettings)) {
             this.gameData.setGameSettings(gameSettings);
         }
@@ -24,13 +24,13 @@ export default class RpsGameflow extends Gameflow{
         this.scene.showRound(roundNumber);
     }
 
-    override showRoundResult(...args: any[]): void {
-        const playerMove = args[0] || 'rock';
+    override showRoundResult(...args: unknown[]): void {
+        const playerMove = isRpsMove(args[0]) ? args[0] : 'rock';
         (this.gameData as RpsGameData).setPlayerMove(playerMove);
         this.scene.showRoundResult(this.gameData.getRoundResultData());
     }
 
-    override showEndGame(result: any): void {
+    override showEndGame(result: unknown): void {
         this.scene.showEndGame(result);
     }
 
@@ -44,11 +44,11 @@ export default class RpsGameflow extends Gameflow{
             if (!isRoundResultData(roundResultData)) return;
     
             if (roundResultData.result) {
-                this.scene.app.stage.emit(GameEvents.GAME_END, roundResultData.result);
+                this.emit(GameEvents.GAME_END, roundResultData.result);
                 return;
             }
     
-            this.scene.app.stage.emit(GameEvents.ROUND_STARTED);
+            this.emit(GameEvents.ROUND_STARTED);
         };
     
         this.subscribe('ANIMATION_COMPLETED', animationCompletedHandler);

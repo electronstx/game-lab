@@ -15,3 +15,10 @@ export type GameState = {
     enteredAt?: number;
     metadata?: Record<string, any>;
 };
+
+export type StateEnterData = {
+    roundNumber?: number;
+    resultData?: unknown;
+    result?: unknown;
+    timescale?: number;
+};

@@ -137,7 +137,7 @@ export class RoundAnimation implements GameAnimation {
             if (this.#screenFlash) {
                 this.#screenFlash.visible = true;
                 this.#screenFlash.alpha = 0;
-                playFlashSound();
+                playFlashSound(this.#scene.soundService);
             }
         });
 
@@ -249,7 +249,7 @@ export class RoundAnimation implements GameAnimation {
         this.#timeouts.push(timeout1);
 
         const timeout2 = setTimeout(() => {
-            this.#scene.app.stage.emit('ANIMATION_COMPLETED', roundResultData);
+            this.#scene.getEventEmitter().emit('ANIMATION_COMPLETED', roundResultData);
             this.reset();
         }, 5000);
         this.#timeouts.push(timeout2);

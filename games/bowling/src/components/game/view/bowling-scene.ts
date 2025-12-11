@@ -1,4 +1,4 @@
-import { GameEvents, Scene } from '@parity-games/core';
+import { GameEvents, Scene, SoundService } from '@parity-games/core';
 import * as PIXI from 'pixi.js';
 import { Scoreboard } from './hud/scoreboard.js';
 import { Lane } from './game-objects/lane.js';
@@ -22,8 +22,8 @@ export default class BowlingScene extends Scene implements IBowlingScene {
     #physicsService!: BowlingPhysicsService;
     #gameLoopTicker: (() => void) | null = null;
 
-    constructor(app: PIXI.Application, scale: number) {
-        super(app, scale);
+    constructor(app: PIXI.Application, soundService: SoundService, scale: number) {
+        super(app, soundService, scale);
         this.#scoreboard = new Scoreboard(this);
         this.hud.addComponent(this.#scoreboard);
 
@@ -80,7 +80,7 @@ export default class BowlingScene extends Scene implements IBowlingScene {
     }
 
     #onPointerDown(): void {
-        this.app.stage.emit('USER_INPUT_BALL_LAUNCH', {
+        this.getEventEmitter().emit('USER_INPUT_BALL_LAUNCH', {
             angle: this.#guideLine.getAngle()
         });
     }
@@ -103,7 +103,7 @@ export default class BowlingScene extends Scene implements IBowlingScene {
         this.animationManager.reset();
         this.gameObjects.show();
         this.startGameLoop();
-        this.app.stage.emit(GameEvents.ROUND_STARTED);
+        this.getEventEmitter().emit(GameEvents.ROUND_STARTED);
     }
 
     override showRound(roundNumber?: number, currentPlayer?: number, shouldResetAllPins: boolean = true): void {
@@ -146,7 +146,7 @@ export default class BowlingScene extends Scene implements IBowlingScene {
 
     override restartGame(): void {
         this.stopGameLoop();
-        this.app.stage.emit(GameEvents.GAME_INIT);
+        this.getEventEmitter().emit(GameEvents.GAME_INIT);
     }
 
     startGameLoop(): void {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { soundService, SoundSettingsState } from '@parity-games/core';
+import { SoundService, SoundSettingsState } from '@parity-games/core';
 
-export const useSoundSettings = () => {
+export const useSoundSettings = (soundService: SoundService) => {
     const [soundSettings, setSoundSettings] = useState<SoundSettingsState>(
         soundService.getSettings()
     );

@@ -97,7 +97,7 @@ export class EndGameAnimation implements GameAnimation {
 
 		this.#autoRestartTimeout = setTimeout(() => {
 			this.reset();
-			this.#scene.app.stage.emit(GameEvents.GAME_RESTARTED);
+			this.#scene.getEventEmitter().emit(GameEvents.GAME_RESTARTED);
 		}, 5000);
 	}
 

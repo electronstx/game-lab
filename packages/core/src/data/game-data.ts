@@ -1,7 +1,7 @@
 import { GameState, GameStateName, GameStates } from "./types";
 
 export default abstract class GameData {
-    protected gameSettings: any;
+    protected gameSettings: Record<string, unknown>;
     protected currentState: GameStateName;
     protected stateHistory: GameState[] = [];
 
@@ -14,7 +14,8 @@ export default abstract class GameData {
         });
     }
 
-    setGameSettings(settings: any): void {
+    setGameSettings(settings: Record<string, unknown>): void {
+        if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return;
         this.gameSettings = settings;
     }
 
@@ -22,7 +23,9 @@ export default abstract class GameData {
         return this.currentState;
     }
 
-    changeState(newState: GameStateName, metadata?: Record<string, any>): void {
+    changeState(newState: GameStateName, metadata?: Record<string, unknown>): void {
+        if (!Object.values(GameStates).includes(newState)) return;
+    
         const previousState = this.currentState;
         this.currentState = newState;
         
@@ -32,6 +35,11 @@ export default abstract class GameData {
             enteredAt: Date.now(),
             metadata,
         });
+    
+        const MAX_HISTORY_SIZE = 100;
+        if (this.stateHistory.length > MAX_HISTORY_SIZE) {
+            this.stateHistory = this.stateHistory.slice(-MAX_HISTORY_SIZE);
+        }
     }
 
     getStateHistory(): readonly GameState[] {
@@ -43,8 +51,31 @@ export default abstract class GameData {
         return lastState?.previousState;
     }
 
-    abstract getGameData(): any;
-    abstract getRoundData(): any;
-    abstract getRoundResultData(): any;   
+    clearStateHistory(): void {
+        const current = this.stateHistory[this.stateHistory.length - 1];
+        this.stateHistory = current ? [current] : [];
+    }
+
+    reset(): void {
+        this.gameSettings = {};
+        const initialState = GameStates.INIT;
+        this.currentState = initialState;
+        this.stateHistory = [{
+            name: initialState,
+            enteredAt: Date.now(),
+        }];
+        this.resetData();
+    }
+
+    destroy(): void {
+        this.gameSettings = {};
+        this.stateHistory = [];
+        this.currentState = GameStates.INIT;
+        this.resetData();
+    }
+
+    abstract getGameData(): Record<string, unknown>;
+    abstract getRoundData(): number;
+    abstract getRoundResultData(): Record<string, unknown>;   
     abstract resetData(): void;
 }

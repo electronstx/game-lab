@@ -1,16 +1,16 @@
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { BowlingGame } from '../../components/game/index.js';
 import { BowlingGameSettings } from '../../components/game/types.js';
-import { GameEvents } from '@parity-games/core';
+import { GameEvents, SoundService } from '@parity-games/core';
 
-export const useBowlingGame = () => {
+export const useBowlingGame = (soundService: SoundService) => {
     const gameRef = useRef<BowlingGame | null>(null);
     const cleanupRef = useRef<(() => void) | null>(null);
     const [isGameStarted, setIsGameStarted] = useState(false);
     
     const createGame = useCallback(() => {
         if (!gameRef.current) {
-            gameRef.current = new BowlingGame();
+            gameRef.current = new BowlingGame(soundService);
         }
         return gameRef.current;
     }, []);

@@ -4,30 +4,69 @@ export class GameObjects {
     #objects: Array<GameObject> = [];
 
     addObject(object: GameObject): void {
+        if (!object) return;
+        
         this.#objects.push(object);
     }
 
-    create(...args: any[]): void {
-        this.#objects.forEach(obj => obj.create(...args));
+    create(...args: unknown[]): void {
+        if (this.#objects.length === 0) return;
+        
+        this.#objects.forEach(obj => {
+            if (obj?.create) {
+                obj.create(...args);
+            }
+        });
     }
 
     show(): void {
-        this.#objects.forEach(obj => obj.show?.());
+        if (this.#objects.length === 0) return;
+
+        this.#objects.forEach(obj => {
+            if (obj?.show) {
+                obj.show();
+            }
+        });
     }
 
     hide(): void {
-        this.#objects.forEach(obj => obj.hide?.());
+        if (this.#objects.length === 0) return;
+
+        this.#objects.forEach(obj => {
+            if (obj?.hide) {
+                obj.hide();
+            }
+        });
     }
 
     update(): void {
-        this.#objects.forEach(obj => obj.update?.());
+        if (this.#objects.length === 0) return;
+
+        this.#objects.forEach(obj => {
+            if (obj?.update) {
+                obj.update();
+            }
+        });
     }
 
     reset(): void {
-        this.#objects.forEach(obj => obj.reset?.());
+        if (this.#objects.length === 0) return;
+
+        this.#objects.forEach(obj => {
+            if (obj?.reset) {
+                obj.reset();
+            }
+        });
     }
 
     destroy(): void {
-        this.#objects.forEach(obj => obj.destroy?.());
+        if (this.#objects.length === 0) return;
+        
+        this.#objects.forEach(obj => {
+            if (obj?.destroy) {
+                obj.destroy();
+            }
+        });
+        this.#objects = [];
     }
 }
