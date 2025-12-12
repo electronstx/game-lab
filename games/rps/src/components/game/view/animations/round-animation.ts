@@ -13,7 +13,9 @@ export class RoundAnimation implements GameAnimation {
     #opponentCard?: PIXI.Sprite;
     #screenFlash?: PIXI.Graphics;
     #shakeTweens?: gsap.core.Timeline[];
-    #timeouts?: any[];
+    #flashTimeline?: gsap.core.Timeline;
+    #victoryTimeline?: gsap.core.Timeline;
+    #timeouts?: ReturnType<typeof setTimeout>[];
 
     constructor(scene: RpsScene) {
         this.#scene = scene;
@@ -56,10 +58,7 @@ export class RoundAnimation implements GameAnimation {
         if (!this.#playerCard || !this.#opponentCard) return;
         if (!this.#scale) return;
 
-        if (this.#shakeTweens) {
-            this.#shakeTweens.forEach(tween => tween.kill());
-            this.#shakeTweens = undefined;
-        }
+        this.#cleanupAllAnimations();
 
         this.#playerCard.tint = 0xFFFFFF;
         this.#opponentCard.tint = 0xFFFFFF;
@@ -89,6 +88,23 @@ export class RoundAnimation implements GameAnimation {
         if (this.#timeouts) {
             this.#timeouts.forEach(timeout => clearTimeout(timeout));
             this.#timeouts = undefined;
+        }
+    }
+
+    #cleanupAllAnimations(): void {
+        if (this.#shakeTweens) {
+            this.#shakeTweens.forEach(tween => tween.kill());
+            this.#shakeTweens = undefined;
+        }
+
+        if (this.#flashTimeline) {
+            this.#flashTimeline.kill();
+            this.#flashTimeline = undefined;
+        }
+
+        if (this.#victoryTimeline) {
+            this.#victoryTimeline.kill();
+            this.#victoryTimeline = undefined;
         }
     }
 
@@ -131,9 +147,13 @@ export class RoundAnimation implements GameAnimation {
     #playFlashAnimation(delay: number = 0): void {
         if (!this.#screenFlash) return;
 
-        const flashTimeline = gsap.timeline({ delay });
+        if (this.#flashTimeline) {
+            this.#flashTimeline.kill();
+        }
 
-        flashTimeline.call(() => {
+        this.#flashTimeline = gsap.timeline({ delay });
+
+        this.#flashTimeline.call(() => {
             if (this.#screenFlash) {
                 this.#screenFlash.visible = true;
                 this.#screenFlash.alpha = 0;
@@ -141,13 +161,13 @@ export class RoundAnimation implements GameAnimation {
             }
         });
 
-        flashTimeline.to(this.#screenFlash, {
+        this.#flashTimeline.to(this.#screenFlash, {
             alpha: 0.8,
             duration: 0.1,
             ease: "power2.out"
         });
 
-        flashTimeline.to(this.#screenFlash, {
+        this.#flashTimeline.to(this.#screenFlash, {
             alpha: 0,
             duration: 0.2,
             ease: "power2.in",
@@ -157,23 +177,22 @@ export class RoundAnimation implements GameAnimation {
                 }
             }
         });
-
-        if (!this.#shakeTweens) {
-            this.#shakeTweens = [];
-        }
-        this.#shakeTweens.push(flashTimeline);
     }
 
     #playVictoryAnimation(winner: 'player' | 'opponent' | 'tie'): void {
         if (!this.#playerCard || !this.#opponentCard || !this.#scale) return;
     
+        if (this.#victoryTimeline) {
+            this.#victoryTimeline.kill();
+        }
+
         const centerX = this.#scene.app.renderer.width / 2;
         const offsetX = 200 * this.#scale;
         
-        const victoryTimeline = gsap.timeline({ delay: 0.3 });
+        this.#victoryTimeline = gsap.timeline({ delay: 0.3 });
         
         if (winner === 'player') {
-            victoryTimeline.to(this.#playerCard, {
+            this.#victoryTimeline.to(this.#playerCard, {
                 scale: 1.2 * this.#scale,
                 x: centerX,
                 alpha: 1,
@@ -181,7 +200,7 @@ export class RoundAnimation implements GameAnimation {
                 ease: "back.out(1.7)"
             }, 0);
             
-            victoryTimeline.to(this.#opponentCard, {
+            this.#victoryTimeline.to(this.#opponentCard, {
                 scale: 0.4 * this.#scale,
                 alpha: 0.5,
                 x: this.#scene.app.renderer.width - offsetX,
@@ -191,7 +210,7 @@ export class RoundAnimation implements GameAnimation {
             
             this.#opponentCard.tint = 0xCCCCCC;   
         } else if (winner === 'opponent') {
-            victoryTimeline.to(this.#opponentCard, {
+            this.#victoryTimeline.to(this.#opponentCard, {
                 scale: 1.2 * this.#scale,
                 x: centerX,
                 alpha: 1,
@@ -199,7 +218,7 @@ export class RoundAnimation implements GameAnimation {
                 ease: "back.out(1.7)"
             }, 0);
             
-            victoryTimeline.to(this.#playerCard, {
+            this.#victoryTimeline.to(this.#playerCard, {
                 scale: 0.4 * this.#scale,
                 alpha: 0.5,
                 x: offsetX,
@@ -209,11 +228,6 @@ export class RoundAnimation implements GameAnimation {
             
             this.#playerCard.tint = 0xCCCCCC;
         }
-        
-        if (!this.#shakeTweens) {
-            this.#shakeTweens = [];
-        }
-        this.#shakeTweens.push(victoryTimeline);
     }
 
     show(roundResultData: RoundResultData): void {
@@ -256,10 +270,13 @@ export class RoundAnimation implements GameAnimation {
     }
 
     destroy(): void {
+        this.#cleanupAllAnimations();
+        
         if (this.#timeouts) {
             this.#timeouts.forEach(timeout => clearTimeout(timeout));
             this.#timeouts = undefined;
         }
+        
         this.reset();
     }
 }

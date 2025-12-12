@@ -2,7 +2,7 @@ export type EventEmitter = {
     on(event: string, handler: (...args: unknown[]) => void): void;
     off(event: string, handler: (...args: unknown[]) => void): void;
     emit(event: string, ...args: unknown[]): void;
-    once?(event: string, handler: (...args: unknown[]) => void): void;
+    once(event: string, handler: (...args: unknown[]) => void): void;
 }
 
 export type GameInitEvent = {

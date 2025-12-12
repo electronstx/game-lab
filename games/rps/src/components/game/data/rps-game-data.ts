@@ -32,7 +32,9 @@ export default class RpsGameData extends GameData {
         const moves = ['rock', 'paper', 'scissors'];
         const opponentMove = moves[Math.floor(Math.random() * moves.length)];
 
-        const roundWinner = this.checkRoundResult(this.#playerMove, opponentMove);
+        const roundWinner = this.determineWinner(this.#playerMove, opponentMove);
+        
+        this.updateScores(roundWinner);
 
         return {
             playerMove: this.#playerMove, 
@@ -48,9 +50,10 @@ export default class RpsGameData extends GameData {
         this.#playerScore = 0;
         this.#opponentScore = 0;
         this.#roundNumber = 1;
+        this.#playerMove = undefined;
     }
 
-    checkRoundResult(playerMove: string, opponentMove: string): 'player' | 'opponent' | 'tie' {
+    determineWinner(playerMove: string, opponentMove: string): 'player' | 'opponent' | 'tie' {
         if (playerMove === opponentMove) {
             return 'tie';
         }
@@ -58,14 +61,17 @@ export default class RpsGameData extends GameData {
         if ((playerMove === 'rock' && opponentMove === 'scissors')
             || (playerMove === 'scissors' && opponentMove === 'paper')
             || (playerMove === 'paper' && opponentMove === 'rock')) {
-            this.#playerScore++;
-            this.#roundNumber++;
             return 'player';
-        } else {
-            this.#opponentScore++;
-            this.#roundNumber++;
-            return 'opponent';
         }
+        
+        return 'opponent';
+    }
+
+    updateScores(winner: 'player' | 'opponent' | 'tie'): void {
+        if (winner === 'tie') return;
+
+        winner === 'player' ? this.#playerScore++ : this.#opponentScore++;
+        this.#roundNumber++;
     }
 
     checkEndGame(): string | null {

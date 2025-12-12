@@ -16,6 +16,7 @@ export default class RpsScene extends Scene {
     #startScreenAnimation: StartScreenAnimation;
     #roundAnimation: RoundAnimation;
     #endGameAnimation: EndGameAnimation;
+    #choicePanelTimeout?: ReturnType<typeof setTimeout>;
 
     constructor(app: PIXI.Application, soundService: SoundService, scale: number) {
         super(app, soundService, scale);
@@ -93,12 +94,15 @@ export default class RpsScene extends Scene {
 
         this.#score.show();
 
-        setTimeout(() => {
+        this.#choicePanelTimeout = setTimeout(() => {
             this.#choicePanel.show();
+            this.#choicePanelTimeout = undefined;
         }, 2000);
     }
 
     override showRoundResult(roundResultData: RoundResultData): void {
+        this.#clearChoicePanelTimeout();
+
         this.#score.hide();
         this.animationManager.show(this.#roundAnimation, roundResultData);
     }
@@ -110,5 +114,18 @@ export default class RpsScene extends Scene {
 
     override restartGame(): void {
         this.getEventEmitter().emit(GameEvents.GAME_INIT);
+    }
+
+    #clearChoicePanelTimeout(): void {
+        if (this.#choicePanelTimeout) {
+            clearTimeout(this.#choicePanelTimeout);
+            this.#choicePanelTimeout = undefined;
+        }
+    }
+
+    override destroy(): void {
+        this.#clearChoicePanelTimeout();
+        
+        super.destroy();
     }
 }

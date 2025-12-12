@@ -14,7 +14,7 @@ export const useSoundSettings = (soundService: SoundService) => {
         return () => {
             unsubscribe();
         };
-    }, []);
+    }, [soundService]);
 
     const toggleSound = () => soundService.toggleSound();
     const toggleMusic = () => soundService.toggleMusic();

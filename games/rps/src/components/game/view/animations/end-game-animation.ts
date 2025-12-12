@@ -11,7 +11,7 @@ export class EndGameAnimation implements GameAnimation {
 	#endText?: PIXI.Text;
 	#end?: PIXI.Container;
 	#endTween?: gsap.core.Tween;
-	#autoRestartTimeout?: any;
+	#autoRestartTimeout?: ReturnType<typeof setTimeout>;
 
 	constructor(scene: RpsScene) {
 		this.#scene = scene;

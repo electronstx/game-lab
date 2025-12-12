@@ -127,7 +127,7 @@ export class RpsGame implements Game {
     }
 
 	#waitForRenderer(signal?: AbortSignal): Promise<void> {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const checkRenderer = () => {
                 if (signal?.aborted || !this.#app) {
                     resolve();
@@ -178,7 +178,7 @@ export class RpsGame implements Game {
 	async once(event: string, listener: (event: unknown) => void): Promise<void> {
 		const scene = await this.whenReady;
 		if (scene) {
-			scene.getEventEmitter().on(event, listener);
+			scene.getEventEmitter().once(event, listener);
 		}
 	}
 

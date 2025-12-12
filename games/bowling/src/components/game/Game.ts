@@ -173,7 +173,7 @@ export class BowlingGame implements Game {
     async once(event: string, listener: (event: unknown) => void): Promise<void> {
         const scene = await this.whenReady;
         if (scene) {
-            scene.getEventEmitter().on(event, listener);
+            scene.getEventEmitter().once(event, listener);
         }
     }
 

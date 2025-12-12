@@ -1,8 +1,7 @@
-import { GameAnimation, GameEvents } from '@parity-games/core';
+import { GameAnimation } from '@parity-games/core';
 import gsap from 'gsap';
 import RpsScene from '../rps-scene';
 import * as PIXI from 'pixi.js';
-import { playClickSound } from '../../sounds';
 
 export class StartScreenAnimation implements GameAnimation {
 	#scene: RpsScene;

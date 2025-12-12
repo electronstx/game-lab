@@ -36,7 +36,7 @@ export const useRpsGame = (soundService: SoundService) => {
         game.on(GameEvents.GAME_STARTED, handleGameStarted);
 
         cleanupRef.current = () => {
-            game.off(GameEvents.GAME_INIT, handleGameStarted);
+            game.off(GameEvents.GAME_INIT, handleGameInit);
             game.off(GameEvents.GAME_STARTED, handleGameStarted);
         };
 
