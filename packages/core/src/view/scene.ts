@@ -29,9 +29,9 @@ export default abstract class Scene extends PIXI.Container {
         if (this.#eventEmitterAdapter) {
             return this.#eventEmitterAdapter;
         }
-        
+
         const stage = this.app.stage;
-        
+
         if (
             typeof stage.on === 'function' &&
             typeof stage.off === 'function' &&
@@ -59,10 +59,10 @@ export default abstract class Scene extends PIXI.Container {
                     }
                 }
             };
-            
+
             return this.#eventEmitterAdapter;
         }
-        
+
         throw new Error('PIXI.Application stage does not implement EventEmitter interface');
     }
 
@@ -90,7 +90,7 @@ export default abstract class Scene extends PIXI.Container {
         }
 
         this.#soundService = null as unknown as SoundService;
-        
+
         super.destroy();
     }
 }

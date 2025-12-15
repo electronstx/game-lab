@@ -25,17 +25,17 @@ export default abstract class GameData {
 
     changeState(newState: GameStateName, metadata?: Record<string, unknown>): void {
         if (!Object.values(GameStates).includes(newState)) return;
-    
+
         const previousState = this.currentState;
         this.currentState = newState;
-        
+
         this.stateHistory.push({
             name: newState,
             previousState,
             enteredAt: Date.now(),
             metadata,
         });
-    
+
         const MAX_HISTORY_SIZE = 100;
         if (this.stateHistory.length > MAX_HISTORY_SIZE) {
             this.stateHistory = this.stateHistory.slice(-MAX_HISTORY_SIZE);
@@ -76,6 +76,6 @@ export default abstract class GameData {
 
     abstract getGameData(): Record<string, unknown>;
     abstract getRoundData(): number;
-    abstract getRoundResultData(): Record<string, unknown>;   
+    abstract getRoundResultData(): Record<string, unknown>;
     abstract resetData(): void;
 }

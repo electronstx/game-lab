@@ -18,7 +18,7 @@ export default abstract class Gameflow {
         this.#setupEventHandlers();
         this.#enterState(this.gameData.getCurrentState());
     }
-    
+
     protected onEnterInit(): void {
         this.scene.showStartScreen();
     }
@@ -67,7 +67,7 @@ export default abstract class Gameflow {
     }
 
     #changeState(newState: GameStateName, data?: StateEnterData): void {
-        this.gameData.changeState(newState, data ? { stateData: data } : undefined);        
+        this.gameData.changeState(newState, data ? { stateData: data } : undefined);
         this.#enterState(newState, data);
     }
 
@@ -76,7 +76,7 @@ export default abstract class Gameflow {
             this.#changeState(GameStates.INIT);
         };
         this.subscribe(GameEvents.GAME_INIT, gameInitHandler);
-        
+
         const gameStartedHandler = () => {
             this.#changeState(GameStates.START);
         };
@@ -86,41 +86,41 @@ export default abstract class Gameflow {
             this.#changeState(GameStates.ROUND);
         };
         this.subscribe(GameEvents.ROUND_STARTED, roundStartedHandler);
-        
+
         const roundCompletedHandler = (...args: unknown[]) => {
             const data = args[0];
-            
+
             if (isRoundCompletedEvent(data)) {
                 this.#changeState(GameStates.ROUND_RESULT, { resultData: data.payload });
                 return;
             }
-            
+
             if (typeof data === 'string' || (typeof data === 'object' && data !== null)) {
                 const roundNumber = this.gameData.getRoundData();
-                this.#changeState(GameStates.ROUND_RESULT, { 
-                    resultData: typeof data === 'string' 
-                        ? { playerMove: data, roundNumber } 
+                this.#changeState(GameStates.ROUND_RESULT, {
+                    resultData: typeof data === 'string'
+                        ? { playerMove: data, roundNumber }
                         : { ...data, roundNumber }
                 });
                 return;
             }
         };
         this.subscribe(GameEvents.ROUND_COMPLETED, roundCompletedHandler);
-        
+
         const gameEndHandler = (...args: unknown[]) => {
             const data = args[0];
-            
+
             if (isGameEndEvent(data)) {
                 const payload = data.payload && typeof data.payload === 'object' ? data.payload : {};
-                this.#changeState(GameStates.END, { 
+                this.#changeState(GameStates.END, {
                     result: 'result' in payload ? payload.result : data,
-                    timescale: 'timescale' in payload && typeof payload.timescale === 'number' 
-                        ? payload.timescale 
+                    timescale: 'timescale' in payload && typeof payload.timescale === 'number'
+                        ? payload.timescale
                         : undefined
                 });
                 return;
             }
-            
+
             if (data !== undefined) {
                 this.#changeState(GameStates.END, { result: data });
             }
@@ -137,19 +137,19 @@ export default abstract class Gameflow {
 
     protected setupCustomEventHandlers(): void { }
 
-    protected subscribe(event: string, handler: (...args: unknown[]) => void): void {   
+    protected subscribe(event: string, handler: (...args: unknown[]) => void): void {
         const oldHandler = this.#eventHandlers.get(event);
         if (oldHandler) {
             this.#eventEmitter.off(event, oldHandler);
         }
-        
+
         this.#eventEmitter.on(event, handler);
         this.#eventHandlers.set(event, handler);
     }
 
     protected emit(event: string, ...args: unknown[]): void {
         if (!this.#eventEmitter) return;
-        
+
         this.#eventEmitter.emit(event, ...args);
     }
 

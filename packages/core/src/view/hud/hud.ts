@@ -5,7 +5,7 @@ export class HUD {
 
     addComponent(component: HUDComponent): void {
         if (!component) return;
-		
+
         this.#components.push(component);
     }
 

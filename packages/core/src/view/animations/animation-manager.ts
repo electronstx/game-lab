@@ -26,7 +26,7 @@ export class AnimationManager {
 
     destroy(): void {
         this.reset();
-        
+
         for (const animation of this.#allAnimations) {
             if (animation.destroy) {
                 animation.destroy();

@@ -33,23 +33,27 @@ export class SoundService {
 			this.#playingSounds.clear();
 		};
 
-		window.addEventListener('beforeunload', this.#pageUnloadHandler, { 
-			capture: true, 
-			signal 
+		window.addEventListener('beforeunload', this.#pageUnloadHandler, {
+			capture: true,
+			signal
 		});
-		window.addEventListener('pagehide', this.#pageUnloadHandler, { 
-			capture: true, 
-			signal 
+		window.addEventListener('pagehide', this.#pageUnloadHandler, {
+			capture: true,
+			signal
 		});
-		window.addEventListener('unload', this.#pageUnloadHandler, { 
-			capture: true, 
-			signal 
+		window.addEventListener('unload', this.#pageUnloadHandler, {
+			capture: true,
+			signal
 		});
 	}
 
 	subscribe(callback: (settings: SoundSettingsState) => void): () => void {
 		this.#subscribers.add(callback);
-		callback(this.getSettings());
+		try {
+			callback(this.getSettings());
+		} catch (error) {
+			console.error('Error in sound settings subscriber:', error);
+		}
 		return () => {
 			this.#subscribers.delete(callback);
 		};
@@ -70,7 +74,7 @@ export class SoundService {
 		if (typeof window === 'undefined') {
 			return { sound: true, music: true };
 		}
-	
+
 		try {
 			const stored = localStorage.getItem(SOUND_SETTINGS_KEY);
 			if (stored) {
@@ -87,7 +91,7 @@ export class SoundService {
 		} catch (error) {
 			console.warn('Failed to load sound settings from localStorage', error);
 		}
-	
+
 		return { sound: true, music: true };
 	}
 
@@ -147,24 +151,24 @@ export class SoundService {
 			console.warn(`Sound "${key}" is not registered`);
 			return undefined;
 		}
-	
+
 		const soundType = this.#soundTypes.get(key) ?? 'effect';
-		const isEnabled = soundType === 'music' 
-			? this.#soundSettings.music 
+		const isEnabled = soundType === 'music'
+			? this.#soundSettings.music
 			: this.#soundSettings.sound;
-	
+
 		if (soundType === 'effect' && !isEnabled) {
 			return undefined;
 		}
-	
+
 		if (options?.loop !== undefined) {
 			sound.loop(options.loop);
 		}
-	
+
 		if (options?.volume !== undefined) {
 			sound.volume(options.volume);
 		}
-	
+
 		if (soundType === 'music') {
 			const soundId = sound.play();
 			if (!isEnabled) {
@@ -173,7 +177,7 @@ export class SoundService {
 			this.#addPlayingSound(key, soundId);
 			return soundId;
 		}
-	
+
 		sound.mute(!isEnabled);
 		const soundId = sound.play();
 		this.#addPlayingSound(key, soundId);
@@ -185,23 +189,23 @@ export class SoundService {
 			this.#playingSounds.set(key, []);
 		}
 		this.#playingSounds.get(key)?.push(soundId);
-	
+
 		const sound = this.#sounds.get(key);
 		if (!sound) {
 			this.#removePlayingSound(key, soundId);
 			return;
 		}
-		
+
 		if (sound.state() === 'unloaded') {
 			this.#removePlayingSound(key, soundId);
 			return;
 		}
-		
+
 		const soundIds = this.#playingSounds.get(key);
 		if (!soundIds || soundIds.length === 0) {
 			return;
 		}
-		
+
 		if (sound.playing(soundId)) {
 			const endHandler = () => {
 				if (this.#isCleanedUp) return;
@@ -209,9 +213,9 @@ export class SoundService {
 				this.#removePlayingSound(key, soundId);
 				this.#removeEventHandler(key, soundId);
 			};
-			
+
 			sound.once('end', endHandler, soundId);
-			
+
 			if (!this.#eventHandlers.has(key)) {
 				this.#eventHandlers.set(key, new Map());
 			}
@@ -244,7 +248,7 @@ export class SoundService {
     stop(key: SoundKey, soundId?: number): void {
 		const sound = this.#sounds.get(key);
 		if (!sound) return;
-	
+
 		if (soundId !== undefined) {
 			sound.stop(soundId);
 			this.#removePlayingSound(key, soundId);
@@ -296,30 +300,30 @@ export class SoundService {
 
     setSoundEnabled(enabled: boolean): void {
 		this.#soundSettings.sound = enabled;
-	
+
 		for (const [key, sound] of this.#sounds.entries()) {
 			if (this.#soundTypes.get(key) !== 'effect') continue;
 			sound.mute(!enabled);
 		}
-	
+
 		this.#saveSettings();
 		this.#notifySubscribers();
 	}
 
 	setMusicEnabled(enabled: boolean): void {
 		this.#soundSettings.music = enabled;
-		
+
 		for (const [key, sound] of this.#sounds.entries()) {
 			const type = this.#soundTypes.get(key);
 			if (type !== 'music') continue;
-	
+
 			if (enabled) {
 				this.#resumeMusic(key, sound);
 			} else {
 				sound.pause();
 			}
 		}
-		
+
 		this.#saveSettings();
 		this.#notifySubscribers();
 	}
@@ -328,24 +332,24 @@ export class SoundService {
 		if (sound.playing()) {
 			return;
 		}
-	
+
 		const soundId = sound.play();
 		if (soundId !== undefined) {
 			if (!this.#playingSounds.has(key)) {
 				this.#playingSounds.set(key, []);
 			}
 			this.#playingSounds.get(key)?.push(soundId);
-			
+
 			if (sound.playing(soundId)) {
 				const endHandler = () => {
 					if (this.#isCleanedUp) return;
-					
+
 					this.#removePlayingSound(key, soundId);
 					this.#removeEventHandler(key, soundId);
 				};
-				
+
 				sound.once('end', endHandler, soundId);
-				
+
 				if (!this.#eventHandlers.has(key)) {
 					this.#eventHandlers.set(key, new Map());
 				}
@@ -366,7 +370,7 @@ export class SoundService {
 
     setSettings(settings: SoundSettingsState): void {
 		this.#soundSettings = { ...settings };
-		
+
 		this.setSoundEnabled(this.#soundSettings.sound);
 		this.setMusicEnabled(this.#soundSettings.music);
 	}
@@ -383,15 +387,15 @@ export class SoundService {
 	cleanup(): void {
 		if (this.#isCleanedUp) return;
 		this.#isCleanedUp = true;
-		
+
 		if (this.#abortController) {
 			this.#abortController.abort();
 			this.#abortController = null;
 		}
 		this.#pageUnloadHandler = null;
-		
+
 		this.stopAll();
-		
+
 		for (const [key, sound] of this.#sounds.entries()) {
 			const handlers = this.#eventHandlers.get(key);
 			if (handlers) {
@@ -401,7 +405,7 @@ export class SoundService {
 			}
 			sound.unload();
 		}
-		
+
 		this.#sounds.clear();
 		this.#soundTypes.clear();
 		this.#playingSounds.clear();
