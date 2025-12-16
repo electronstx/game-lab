@@ -1,5 +1,7 @@
 import { Howl, Howler } from 'howler';
 import type { SoundConfig, SoundKey, SoundSettingsState, SoundType } from './types.js';
+import { AudioError, ErrorCategory, ErrorSeverity, GameError, handleErrorSilently, StorageError } from '@parity-games/errors';
+import { safeCleanup } from '../../utils/cleanup.js';
 
 const SOUND_SETTINGS_KEY = 'parity-games-sound-settings';
 
@@ -49,11 +51,8 @@ export class SoundService {
 
 	subscribe(callback: (settings: SoundSettingsState) => void): () => void {
 		this.#subscribers.add(callback);
-		try {
-			callback(this.getSettings());
-		} catch (error) {
-			console.error('Error in sound settings subscriber:', error);
-		}
+		callback(this.getSettings());
+
 		return () => {
 			this.#subscribers.delete(callback);
 		};
@@ -62,11 +61,7 @@ export class SoundService {
 	#notifySubscribers(): void {
 		const settings = this.getSettings();
 		this.#subscribers.forEach(callback => {
-			try {
-				callback(settings);
-			} catch (error) {
-				console.error('Error in sound settings subscriber:', error);
-			}
+			callback(settings);
 		});
 	}
 
@@ -89,7 +84,11 @@ export class SoundService {
 				}
 			}
 		} catch (error) {
-			console.warn('Failed to load sound settings from localStorage', error);
+			const storageError = new StorageError(
+				'Failed to load sound settings from localStorage',
+				{ component: 'SoundService', method: '#loadSettings', originalError: error }
+			);
+			handleErrorSilently(storageError);
 		}
 
 		return { sound: true, music: true };
@@ -101,7 +100,11 @@ export class SoundService {
 		try {
 			localStorage.setItem(SOUND_SETTINGS_KEY, JSON.stringify(this.#soundSettings));
 		} catch (error) {
-			console.warn('Failed to save sound settings to localStorage', error);
+			const storageError = new StorageError(
+				'Failed to save sound settings to localStorage',
+				{ component: 'SoundService', method: '#saveSettings', originalError: error }
+			);
+			handleErrorSilently(storageError);
 		}
 	}
 
@@ -116,9 +119,14 @@ export class SoundService {
                 loop: config.loop ?? defaultLoop,
                 volume: config.volume ?? 1.0,
                 onloaderror: (id, error) => {
-                    const audioType = type === 'music' ? 'music' : 'sound';
-                    console.error(`Failed to load ${audioType} "${key}":`, error);
-                }
+					const audioType = type === 'music' ? 'music' : 'sound';
+					const audioError = new AudioError(
+						`Failed to load ${audioType} "${key}"`,
+						key,
+						{ component: 'SoundService', method: '#registerAudio', originalError: error }
+					);
+					handleErrorSilently(audioError);
+				}
             });
 
             if (type === 'effect') {
@@ -132,9 +140,14 @@ export class SoundService {
             this.#sounds.set(key, sound);
             this.#soundTypes.set(key, type);
         } catch (error) {
-            const audioType = type === 'music' ? 'music' : 'sound';
-            console.error(`Failed to register ${audioType} "${key}":`, error);
-        }
+			const audioType = type === 'music' ? 'music' : 'sound';
+			const audioError = new AudioError(
+				`Failed to register ${audioType} "${key}"`,
+				key,
+				{ component: 'SoundService', method: '#registerAudio', originalError: error }
+			);
+			handleErrorSilently(audioError);
+		}
     }
 
     registerSound(key: SoundKey, config: SoundConfig): void {
@@ -148,7 +161,14 @@ export class SoundService {
 	play(key: SoundKey, options?: { loop?: boolean; volume?: number }): number | undefined {
 		const sound = this.#sounds.get(key);
 		if (!sound) {
-			console.warn(`Sound "${key}" is not registered`);
+			const audioError = new GameError(
+				`Sound "${key}" is not registered`,
+				ErrorSeverity.MEDIUM,
+				ErrorCategory.AUDIO,
+				{ component: 'SoundService', method: 'play', soundKey: key },
+				true
+			);
+			handleErrorSilently(audioError);
 			return undefined;
 		}
 
@@ -161,27 +181,43 @@ export class SoundService {
 			return undefined;
 		}
 
-		if (options?.loop !== undefined) {
-			sound.loop(options.loop);
-		}
-
-		if (options?.volume !== undefined) {
-			sound.volume(options.volume);
-		}
-
-		if (soundType === 'music') {
-			const soundId = sound.play();
-			if (!isEnabled) {
-				sound.pause(soundId);
+		try {
+			if (options?.loop !== undefined) {
+				sound.loop(options.loop);
 			}
-			this.#addPlayingSound(key, soundId);
-			return soundId;
+
+			if (options?.volume !== undefined) {
+				sound.volume(options.volume);
+			}
+
+			if (soundType === 'music') {
+				const soundId = sound.play();
+				if (soundId !== undefined) {
+					if (!isEnabled) {
+						sound.pause(soundId);
+					}
+					this.#addPlayingSound(key, soundId);
+					return soundId;
+				}
+			}
+
+			sound.mute(!isEnabled);
+			const soundId = sound.play();
+			if (soundId !== undefined) {
+				this.#addPlayingSound(key, soundId);
+				return soundId;
+			}
+		} catch (error) {
+			const audioError = new AudioError(
+				`Failed to play sound "${key}"`,
+				key,
+				{ component: 'SoundService', method: 'play', originalError: error }
+			);
+			handleErrorSilently(audioError);
+			return undefined;
 		}
 
-		sound.mute(!isEnabled);
-		const soundId = sound.play();
-		this.#addPlayingSound(key, soundId);
-		return soundId;
+		return undefined;
 	}
 
 	#addPlayingSound(key: SoundKey, soundId: number): void {
@@ -287,6 +323,7 @@ export class SoundService {
 		if (!sound) return;
 
 		const clampedVolume = Math.max(0, Math.min(1, volume));
+
 		if (soundId !== undefined) {
 			sound.volume(clampedVolume, soundId);
 		} else {
@@ -397,13 +434,20 @@ export class SoundService {
 		this.stopAll();
 
 		for (const [key, sound] of this.#sounds.entries()) {
-			const handlers = this.#eventHandlers.get(key);
-			if (handlers) {
-				for (const [soundId, handler] of handlers) {
-					sound.off('end', handler, soundId);
-				}
-			}
-			sound.unload();
+			safeCleanup(
+				`sound "${key}"`,
+				() => {
+					const handlers = this.#eventHandlers.get(key);
+					if (handlers) {
+						for (const [soundId, handler] of handlers) {
+							sound.off('end', handler, soundId);
+						}
+					}
+					sound.unload();
+				},
+				'SoundService',
+				'cleanup'
+			);
 		}
 
 		this.#sounds.clear();
@@ -415,6 +459,8 @@ export class SoundService {
 
     isPlaying(key: SoundKey): boolean {
 		const sound = this.#sounds.get(key);
-		return sound ? sound.playing() : false;
+		if (!sound) return false;
+
+		return sound.playing();
 	}
 }

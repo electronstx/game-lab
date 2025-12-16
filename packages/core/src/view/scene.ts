@@ -4,6 +4,8 @@ import { AnimationManager } from './animations/animation-manager.js';
 import { GameObjects } from './game-objects/game-objects.js';
 import { EventEmitter } from '../data/events.js';
 import { SoundService } from '../services/sound/sound-service.js';
+import { ErrorCategory, ErrorSeverity, GameError, handleError, handleErrorSilently, InitializationError } from '@parity-games/errors';
+import { safeCleanup } from '../utils/cleanup.js';
 
 export default abstract class Scene extends PIXI.Container {
     app: PIXI.Application;
@@ -52,8 +54,19 @@ export default abstract class Scene extends PIXI.Container {
                         stage.once(event, handler);
                     } else {
                         const onceHandler = (...args: unknown[]) => {
-                            handler(...args);
-                            stage.off(event, onceHandler);
+                            try {
+                                handler(...args);
+                                stage.off(event, onceHandler);
+                            } catch (error) {
+                                const gameError = new GameError(
+                                    `Error in once event handler for "${event}"`,
+                                    ErrorSeverity.MEDIUM,
+                                    ErrorCategory.EVENT,
+                                    { component: 'Scene', method: 'getEventEmitter.once', event, originalError: error },
+                                    true
+                                );
+                                handleErrorSilently(gameError);
+                            }
                         };
                         stage.on(event, onceHandler);
                     }
@@ -63,7 +76,13 @@ export default abstract class Scene extends PIXI.Container {
             return this.#eventEmitterAdapter;
         }
 
-        throw new Error('PIXI.Application stage does not implement EventEmitter interface');
+        const error = new InitializationError(
+            'PIXI.Application stage does not implement EventEmitter interface',
+            { component: 'Scene', method: 'getEventEmitter' }
+        );
+        handleError(error);
+
+        throw error;
     }
 
     get soundService(): SoundService {
@@ -81,16 +100,14 @@ export default abstract class Scene extends PIXI.Container {
     abstract restartGame(): void;
 
     destroy(): void {
-        this.animationManager.destroy();
-        this.hud.destroy();
-        this.gameObjects.destroy();
+        safeCleanup('animation manager', () => this.animationManager.destroy(), 'Scene', 'destroy');
+        safeCleanup('HUD', () => this.hud.destroy(), 'Scene', 'destroy');
+        safeCleanup('game objects', () => this.gameObjects.destroy(), 'Scene', 'destroy');
+        safeCleanup('PIXI container', () => super.destroy(), 'Scene', 'destroy');
 
         if (this.#eventEmitterAdapter) {
             this.#eventEmitterAdapter = null;
         }
-
         this.#soundService = null as unknown as SoundService;
-
-        super.destroy();
     }
 }

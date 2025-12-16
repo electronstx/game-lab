@@ -1,8 +1,10 @@
+import { ErrorCategory, ErrorSeverity, GameError, handleError, handleErrorSilently, InitializationError, StateError } from "@parity-games/errors";
 import { GameEndEvent, GameEvents, EventEmitter, RoundCompletedEvent, RoundStartedEvent } from "../data/events.js";
 import GameData from "../data/game-data.js";
 import { GameStateName, GameStates, StateEnterData } from "../data/types.js";
 import { isGameEndEvent, isRoundCompletedEvent } from "../utils/guards.js";
 import Scene from "../view/scene.js";
+import { safeCleanup } from "../utils/cleanup.js";
 
 export default abstract class Gameflow {
     protected gameData: GameData;
@@ -13,7 +15,16 @@ export default abstract class Gameflow {
     constructor(gameData: GameData, scene: Scene) {
         this.gameData = gameData;
         this.scene = scene;
-        this.#eventEmitter = scene.getEventEmitter();
+        try {
+            this.#eventEmitter = scene.getEventEmitter();
+        } catch (error) {
+            const initializationError = new InitializationError(
+                'Failed to get event emitter from scene',
+                { component: 'Gameflow', method: 'constructor', originalError: error }
+            );
+            handleError(initializationError);
+            throw initializationError;
+        }
 
         this.#setupEventHandlers();
         this.#enterState(this.gameData.getCurrentState());
@@ -44,31 +55,49 @@ export default abstract class Gameflow {
     }
 
     #enterState(stateName: GameStateName, data?: StateEnterData): void {
-        switch (stateName) {
-            case GameStates.INIT:
-                this.onEnterInit();
-                break;
-            case GameStates.START:
-                this.onEnterStart();
-                break;
-            case GameStates.ROUND:
-                this.onEnterRound();
-                break;
-            case GameStates.ROUND_RESULT:
-                this.onEnterRoundResult(data?.resultData);
-                break;
-            case GameStates.END:
-                this.onEnterEnd(data?.result, data?.timescale);
-                break;
-            case GameStates.RESTART:
-                this.onEnterRestart();
-                break;
+        try {
+            switch (stateName) {
+                case GameStates.INIT:
+                    this.onEnterInit();
+                    break;
+                case GameStates.START:
+                    this.onEnterStart();
+                    break;
+                case GameStates.ROUND:
+                    this.onEnterRound();
+                    break;
+                case GameStates.ROUND_RESULT:
+                    this.onEnterRoundResult(data?.resultData);
+                    break;
+                case GameStates.END:
+                    this.onEnterEnd(data?.result, data?.timescale);
+                    break;
+                case GameStates.RESTART:
+                    this.onEnterRestart();
+                    break;
+            }
+        } catch (error) {
+            const stateError = new StateError(
+                `Failed to enter state "${stateName}"`,
+                stateName,
+                { component: 'Gameflow', method: '#enterState', originalError: error }
+            );
+            handleError(stateError);
         }
     }
 
     #changeState(newState: GameStateName, data?: StateEnterData): void {
-        this.gameData.changeState(newState, data ? { stateData: data } : undefined);
-        this.#enterState(newState, data);
+        try {
+            this.gameData.changeState(newState, data ? { stateData: data } : undefined);
+            this.#enterState(newState, data);
+        } catch (error) {
+            const stateError = new StateError(
+                `Failed to change state to "${newState}"`,
+                newState,
+                { component: 'Gameflow', method: '#changeState', originalError: error }
+            );
+            handleError(stateError);
+        }
     }
 
     #setupEventHandlers(): void {
@@ -138,13 +167,27 @@ export default abstract class Gameflow {
     protected setupCustomEventHandlers(): void { }
 
     protected subscribe(event: string, handler: (...args: unknown[]) => void): void {
+        const wrappedHandler = (...args: unknown[]) => {
+            try {
+                handler(...args);
+            } catch (error) {
+                const gameError = new GameError(
+                    `Error in event handler for "${event}"`,
+                    ErrorSeverity.HIGH,
+                    ErrorCategory.EVENT,
+                    { component: 'Gameflow', method: 'subscribe', event, originalError: error },
+                    true
+                );
+                handleError(gameError);
+            }
+        };
+
         const oldHandler = this.#eventHandlers.get(event);
         if (oldHandler) {
             this.#eventEmitter.off(event, oldHandler);
         }
-
-        this.#eventEmitter.on(event, handler);
-        this.#eventHandlers.set(event, handler);
+        this.#eventEmitter.on(event, wrappedHandler);
+        this.#eventHandlers.set(event, wrappedHandler);
     }
 
     protected emit(event: string, ...args: unknown[]): void {
@@ -155,7 +198,12 @@ export default abstract class Gameflow {
 
     cleanupEventHandlers(): void {
         for (const [event, handler] of this.#eventHandlers) {
-            this.#eventEmitter.off(event, handler);
+            safeCleanup(
+                `event handler for "${event}"`,
+                () => this.#eventEmitter.off(event, handler),
+                'Gameflow',
+                'cleanupEventHandlers'
+            );
         }
         this.#eventHandlers.clear();
     }

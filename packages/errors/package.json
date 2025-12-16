@@ -1,0 +1,29 @@
+{
+    "name": "@parity-games/errors",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "vite build && tsc --emitDeclarationOnly --outDir dist",
+        "dev": "vite build --watch",
+        "lint": "biome check ."
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@biomejs/biome": "^2.2.4",
+        "typescript": "^5.9.2",
+        "vite": "^5.4.0"
+    }
+}

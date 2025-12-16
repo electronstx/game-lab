@@ -268,7 +268,11 @@ describe('Gameflow', () => {
             const handler = vi.fn();
             gameflow['subscribe']('TEST_EVENT', handler);
 
-            expect(mockEventEmitter.on).toHaveBeenCalledWith('TEST_EVENT', handler);
+            expect(mockEventEmitter.on).toHaveBeenCalledWith('TEST_EVENT', expect.any(Function));
+
+            const eventEmitter = scene.getEventEmitter();
+            eventEmitter.emit('TEST_EVENT', 'test-arg');
+            expect(handler).toHaveBeenCalledWith('test-arg');
         });
 
         it('should unsubscribe old handler before subscribing new one', () => {
@@ -277,10 +281,21 @@ describe('Gameflow', () => {
 
             gameflow['subscribe']('TEST_EVENT', oldHandler);
 
+            (mockEventEmitter.off as ReturnType<typeof vi.fn>).mockClear();
+            (mockEventEmitter.on as ReturnType<typeof vi.fn>).mockClear();
+
             gameflow['subscribe']('TEST_EVENT', newHandler);
 
-            expect(mockEventEmitter.off).toHaveBeenCalledWith('TEST_EVENT', oldHandler);
-            expect(mockEventEmitter.on).toHaveBeenCalledWith('TEST_EVENT', newHandler);
+            expect(mockEventEmitter.off).toHaveBeenCalled();
+            expect(mockEventEmitter.off).toHaveBeenCalledWith('TEST_EVENT', expect.any(Function));
+
+            expect(mockEventEmitter.on).toHaveBeenCalledWith('TEST_EVENT', expect.any(Function));
+
+            const eventEmitter = scene.getEventEmitter();
+            eventEmitter.emit('TEST_EVENT', 'test-arg');
+
+            expect(newHandler).toHaveBeenCalledWith('test-arg');
+            expect(oldHandler).not.toHaveBeenCalled();
         });
     });
 
@@ -304,6 +319,9 @@ describe('Gameflow', () => {
         });
 
         it('should clear event handlers map', () => {
+            const handler1 = vi.fn();
+            gameflow['subscribe']('OLD_EVENT', handler1);
+
             const initialOffCalls = (mockEventEmitter.off as ReturnType<typeof vi.fn>).mock.calls.length;
 
             gameflow.cleanupEventHandlers();
@@ -312,7 +330,11 @@ describe('Gameflow', () => {
 
             const newHandler = vi.fn();
             gameflow['subscribe']('NEW_EVENT', newHandler);
-            expect(mockEventEmitter.on).toHaveBeenCalledWith('NEW_EVENT', newHandler);
+            expect(mockEventEmitter.on).toHaveBeenCalledWith('NEW_EVENT', expect.any(Function));
+
+            const eventEmitter = scene.getEventEmitter();
+            eventEmitter.emit('NEW_EVENT', 'test-arg');
+            expect(newHandler).toHaveBeenCalledWith('test-arg');
         });
     });
 

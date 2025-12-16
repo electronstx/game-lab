@@ -1,4 +1,5 @@
 import { GameState, GameStateName, GameStates } from "./types";
+import { ValidationError, StateError, handleErrorSilently } from '@parity-games/errors';
 
 export default abstract class GameData {
     protected gameSettings: Record<string, unknown>;
@@ -15,7 +16,14 @@ export default abstract class GameData {
     }
 
     setGameSettings(settings: Record<string, unknown>): void {
-        if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return;
+        if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
+            const validationError = new ValidationError(
+                'Invalid game settings provided',
+                { component: 'GameData', method: 'setGameSettings' }
+            );
+            handleErrorSilently(validationError);
+            return;
+        }
         this.gameSettings = settings;
     }
 
@@ -24,7 +32,15 @@ export default abstract class GameData {
     }
 
     changeState(newState: GameStateName, metadata?: Record<string, unknown>): void {
-        if (!Object.values(GameStates).includes(newState)) return;
+        if (!Object.values(GameStates).includes(newState)) {
+            const stateError = new StateError(
+                `Invalid state "${newState}"`,
+                newState,
+                { component: 'GameData', method: 'changeState' }
+            );
+            handleErrorSilently(stateError);
+            return;
+        }
 
         const previousState = this.currentState;
         this.currentState = newState;

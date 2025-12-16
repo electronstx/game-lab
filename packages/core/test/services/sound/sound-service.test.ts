@@ -159,10 +159,10 @@ describe('SoundService', () => {
             });
             const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-            service.subscribe(errorCallback);
-            service.setSoundEnabled(false);
+            expect(() => {
+                service.subscribe(errorCallback);
+            }).toThrow('Test error');
 
-            expect(consoleErrorSpy).toHaveBeenCalled();
             consoleErrorSpy.mockRestore();
         });
     });
@@ -263,7 +263,9 @@ describe('SoundService', () => {
             const soundId = service.play('unregistered');
 
             expect(soundId).toBeUndefined();
-            expect(consoleWarnSpy).toHaveBeenCalledWith('Sound "unregistered" is not registered');
+            expect(consoleWarnSpy).toHaveBeenCalled();
+            expect(consoleWarnSpy.mock.calls[0][0]).toContain('[GameError]');
+            expect(consoleWarnSpy.mock.calls[0][0]).toContain('Sound "unregistered" is not registered');
             consoleWarnSpy.mockRestore();
         });
 
@@ -715,18 +717,20 @@ describe('SoundService', () => {
                 throw new Error('Storage quota exceeded');
             });
 
-            const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            const consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => {}); // Изменить на console.info
 
             service.setSoundEnabled(false);
 
-            expect(consoleWarnSpy).toHaveBeenCalled();
-            consoleWarnSpy.mockRestore();
+            expect(consoleInfoSpy).toHaveBeenCalled(); // Изменить на consoleInfoSpy
+            expect(consoleInfoSpy.mock.calls[0][0]).toContain('[StorageError]');
+            expect(consoleInfoSpy.mock.calls[0][0]).toContain('Failed to save sound settings to localStorage');
+            consoleInfoSpy.mockRestore();
 
             mockLocalStorage.setItem = originalSetItem;
         });
 
         it('should handle sound loading errors', () => {
-            const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+            const consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => {}); // Изменить на console.info
             const config: SoundConfig = { src: 'invalid.mp3' };
 
             service.registerSound('test-sound', config);
@@ -738,8 +742,10 @@ describe('SoundService', () => {
             const onloaderror = howlCall[0].onloaderror;
             onloaderror(1, new Error('Load failed'));
 
-            expect(consoleErrorSpy).toHaveBeenCalled();
-            consoleErrorSpy.mockRestore();
+            expect(consoleInfoSpy).toHaveBeenCalled(); // Изменить на consoleInfoSpy
+            expect(consoleInfoSpy.mock.calls[0][0]).toContain('[AudioError]');
+            expect(consoleInfoSpy.mock.calls[0][0]).toContain('Failed to load');
+            consoleInfoSpy.mockRestore();
         });
     });
 });
