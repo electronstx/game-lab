@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./ButtonGroup.css";
 import { ButtonGroupProps, Option } from "./types.js";
+import { safeCall } from "../../utils/safe-call";
 
 export const ButtonGroup = ({
     name,
@@ -16,20 +17,33 @@ export const ButtonGroup = ({
 
     useEffect(() => {
         if (isControlled) {
-            setCurrentValue(value);
+            safeCall(
+                () => setCurrentValue(value),
+                { component: 'ButtonGroup', method: 'useEffect' },
+                true
+            );
         }
     }, [value, isControlled]);
 
     const handleChange = (option: Option) => () => {
         if (disabled) return;
-        
+
         const activeValue = isControlled ? value : currentValue;
         if (activeValue?.toString() === option.value.toString()) return;
 
         if (!isControlled) {
-            setCurrentValue(option.value);
+            safeCall(
+                () => setCurrentValue(option.value),
+                { component: 'ButtonGroup', method: 'setCurrentValue' },
+                true
+            );
         }
-        onChange?.(option);
+
+        safeCall(
+            () => onChange?.(option),
+            { component: 'ButtonGroup', method: 'onChange' },
+            false
+        );
     };
 
     const activeValue = isControlled ? value : currentValue;

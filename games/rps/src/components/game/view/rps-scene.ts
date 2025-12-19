@@ -66,7 +66,7 @@ export default class RpsScene extends Scene {
         const scaleY = screenHeight / bgHeight;
 
         this.#bg.scale.set(scaleY);
-        
+
         this.#bg.position.set(screenWidth / 2, screenHeight / 2);
     }
 
@@ -125,7 +125,7 @@ export default class RpsScene extends Scene {
 
     override destroy(): void {
         this.#clearChoicePanelTimeout();
-        
+
         super.destroy();
     }
 }

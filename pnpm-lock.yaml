@@ -172,6 +172,10 @@ importers:
         version: 5.4.21
 
   packages/ui:
+    dependencies:
+      '@parity-games/errors':
+        specifier: workspace:*
+        version: link:../errors
     devDependencies:
       '@biomejs/biome':
         specifier: ^2.2.4

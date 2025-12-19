@@ -5,7 +5,7 @@ export const useSoundSettings = (soundService: SoundService) => {
     const [soundSettings, setSoundSettings] = useState<SoundSettingsState>(
         soundService.getSettings()
     );
-    
+
     useEffect(() => {
         const unsubscribe = soundService.subscribe((settings) => {
             setSoundSettings(settings);

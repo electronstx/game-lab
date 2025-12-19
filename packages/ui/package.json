@@ -19,7 +19,9 @@
         "dev": "vite build --watch",
         "lint": "biome check ."
     },
-    "dependencies": {},
+    "dependencies": {
+        "@parity-games/errors": "workspace:*"
+    },
     "peerDependencies": {
         "react": "^18.3.1",
         "react-dom": "^18.3.1"

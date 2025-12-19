@@ -109,3 +109,16 @@ export class CleanupError extends GameError {
         this.name = 'CleanupError';
     }
 }
+
+export class RenderingError extends GameError {
+    constructor(message: string, context?: ErrorContext) {
+        super(
+            message,
+            ErrorSeverity.HIGH,
+            ErrorCategory.RENDERING,
+            context,
+            true
+        );
+        this.name = 'RenderingError';
+    }
+}

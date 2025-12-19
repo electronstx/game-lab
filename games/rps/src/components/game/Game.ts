@@ -6,17 +6,15 @@ import { ScaleManager } from "./utils/scale.js";
 import { GameEvents, GameStates, SoundService } from '@parity-games/core';
 import { getAssets } from './assets-manifest.js';
 import { initGameSounds } from './sounds.js';
-import { Game } from '@parity-games/ui';
-import { RpsGameSettings } from './types.js';
+import { Game, RpsGameSettings } from './types.js';
 
 export class RpsGame implements Game {
-	#app!: Application;
-	#gameScene!: RpsScene;
-	#gameData!: RpsGameData;
-	#gameflow!: RpsGameflow;
-	#sceneReady!: Promise<RpsScene>;
-	#scaleManager!: ScaleManager;
-	#isInitializing: boolean = false;
+	#app: Application | null = null;
+	#gameScene: RpsScene | null = null;
+	#gameData: RpsGameData | null = null;
+	#gameflow: RpsGameflow | null = null;
+	#sceneReady: Promise<RpsScene | null> | null = null;
+	#scaleManager: ScaleManager | null = null;
     #abortController: AbortController | null = null;
 	#soundService: SoundService;
 
@@ -25,22 +23,6 @@ export class RpsGame implements Game {
 	}
 
 	async init(parent: HTMLDivElement) {
-		if (this.#app && this.#gameScene && this.#app.renderer) {
-            return this;
-        }
-    
-        if (this.#isInitializing) {
-            try {
-                await this.#sceneReady;
-                return this;
-            } catch { }
-        }
-    
-        if (this.#app) {
-            this.destroy();
-        }
-    
-        this.#isInitializing = true;
         this.#abortController = new AbortController();
         const signal = this.#abortController.signal;
 
@@ -48,6 +30,8 @@ export class RpsGame implements Game {
 
 		this.#sceneReady = (async () => {
 			try {
+				if (!this.#app) return null;
+
 				await this.#app.init({
 					backgroundColor: 0x000000,
 					resolution: window.devicePixelRatio || 1,
@@ -57,20 +41,15 @@ export class RpsGame implements Game {
 					autoStart: false
 				});
 
-				if (signal.aborted || !this.#app) {
-					return null as any;
-				}
-
-				await this.#waitForRenderer(signal);
-
-				if (signal.aborted || !this.#app) {
-					return null as any;
-				}
+				if (signal.aborted) return null;
 
 				await getAssets();
 
+				if (signal.aborted) return null;
+
 				initGameSounds(this.#soundService);
 
+				if (!this.#app.canvas) return null;
 				parent.appendChild(this.#app.canvas);
 
 				this.#scaleManager = new ScaleManager(this.#app, parent, 1280, 768, 'contain');
@@ -79,84 +58,54 @@ export class RpsGame implements Game {
 				this.#app.stage.addChild(this.#gameScene);
 				await this.#gameScene.create();
 
-				if (this.#app.ticker && !this.#app.ticker.started) {
+				if (!signal.aborted) {
 					this.#app.ticker.start();
+					this.#gameData = new RpsGameData(GameStates.INIT);
+					this.#gameflow = new RpsGameflow(this.#gameData, this.#gameScene);
 				}
 
-				this.#gameData = new RpsGameData(GameStates.INIT);
-
-				if (this.#gameflow) {
-					this.#gameflow.cleanupEventHandlers();
-					this.#gameflow = null as any;
+				if (this.#scaleManager) {
+					this.#scaleManager.onResize((scale, w, h) => {
+						if (!signal.aborted && this.#gameScene) {
+							this.#gameScene.onResize(scale, w, h);
+						}
+					});
 				}
-
-				this.#gameflow = new RpsGameflow(this.#gameData, this.#gameScene);
-
-				this.#scaleManager.onResize((scale, w, h) => {
-					this.#gameScene.onResize(scale, w, h);
-				});
-
-				this.#isInitializing = false;
-				this.#abortController = null;
 
 				return this.#gameScene;
 			} catch (error) {
-                this.#isInitializing = false;
-                this.#abortController = null;
+				if (signal.aborted) {
+					return null;
+				}
+				throw error;
+			}
+		})();
 
-                if (signal.aborted) {
-                    return null as any;
-                }
-
-                throw error;
-            }
-        })();
-
-		try {
-            await this.#sceneReady;
-            if (!this.#app || !this.#gameScene) {
-                return this;
-            }
-        } catch (error) {
-            if (!signal.aborted) {
-                throw error;
-            }
-        }
-        
         return this;
     }
 
-	#waitForRenderer(signal?: AbortSignal): Promise<void> {
-        return new Promise((resolve) => {
-            const checkRenderer = () => {
-                if (signal?.aborted || !this.#app) {
-                    resolve();
-                    return;
-                }
-    
-                if (this.#app.renderer && this.#app.renderer.canvas) {
-                    resolve();
-                } else {
-                    requestAnimationFrame(checkRenderer);
-                }
-            };
-            checkRenderer();
-        });
-    }
-
 	get scene(): RpsScene {
+		if (!this.#gameScene) {
+			throw new Error('Scene not initialized');
+		}
 		return this.#gameScene;
 	}
 
-	get whenReady(): Promise<RpsScene> {
+	get whenReady(): Promise<RpsScene | null> {
+		if (!this.#sceneReady) {
+			throw new Error('Game not initialized');
+		}
 		return this.#sceneReady;
 	}
 
 	async setGameSettings(settings: RpsGameSettings): Promise<void> {
 		await this.whenReady;
+		if (!this.#gameflow) {
+			throw new Error('Gameflow not initialized');
+		}
 		this.#gameflow.setGameSettings(settings);
 	}
-	
+
 	async startGame(): Promise<void> {
 		await this.emit(GameEvents.GAME_STARTED);
 	}
@@ -194,16 +143,20 @@ export class RpsGame implements Game {
             this.#abortController.abort();
             this.#abortController = null;
         }
-        
-        this.#isInitializing = false;
 
 		if (this.#app) {
+			if (this.#app.ticker) {
+				this.#app.ticker.stop();
+			}
+
 			if (this.#gameflow) {
 				this.#gameflow.destroy();
+				this.#gameflow = null;
 			}
 
 			if (this.#gameScene) {
 				this.#gameScene.destroy();
+				this.#gameScene = null;
 			}
 
 			if (this.#app.renderer && this.#app.canvas && this.#app.canvas.parentNode) {
@@ -212,9 +165,8 @@ export class RpsGame implements Game {
 
 			if (this.#scaleManager) {
 				this.#scaleManager.cleanup();
+				this.#scaleManager = null;
 			}
-			
-			this.#soundService.cleanup();
 
 			if (this.#app.stage) {
 				this.#app.stage.removeAllListeners();
@@ -223,12 +175,10 @@ export class RpsGame implements Game {
 			if (this.#app.renderer) {
 				this.#app.destroy(true);
 			}
-			this.#app = null as any;
+			this.#app = null;
 		}
-		
-		this.#gameScene = null as any;
-		this.#gameData = null as any;
-		this.#gameflow = null as any;
-		this.#scaleManager = null as any;
+
+		this.#sceneReady = null;
+		this.#gameData = null;
 	}
 }

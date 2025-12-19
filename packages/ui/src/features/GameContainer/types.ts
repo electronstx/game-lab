@@ -1,9 +1,6 @@
-export type Game = {
-    init(parent: HTMLDivElement): Promise<Game>;
-    destroy(): void;
-}
+import { GameError } from "@parity-games/errors";
 
 export type GameContainerProps = {
-    createGame: () => Game;
-    onError?: (error: Error) => void;
+    containerRef: React.RefObject<HTMLDivElement>;
+    onError?: (error: GameError) => void;
 }

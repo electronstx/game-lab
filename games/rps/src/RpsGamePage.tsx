@@ -1,4 +1,4 @@
-import { CreateForm, FooterPanel, GameContainer, HeaderPanel, SoundSettings } from "@parity-games/ui";
+import { CreateForm, ErrorBoundary, FooterPanel, GameContainer, HeaderPanel, SoundSettings } from "@parity-games/ui";
 import { RpsGameSettings } from "./components/ui/features/RpsGameSettings/RpsGameSettings.js";
 import { useSoundSettings } from "./utils/hooks/useSoundSettings.js";
 import { useRpsGame } from "./utils/hooks/useRpsGame.js";
@@ -8,7 +8,7 @@ import { useEffect, useMemo } from "react";
 export const RpsGamePage = () => {
     const soundService = useMemo(() => new SoundService(), []);
     const { soundSettings, toggleSound, toggleMusic } = useSoundSettings(soundService);
-    const { createGame, startGame, isGameStarted } = useRpsGame(soundService);
+    const { containerRef, startGame, isGameStarted } = useRpsGame(soundService);
 
     useEffect(() => {
         return () => {
@@ -17,9 +17,9 @@ export const RpsGamePage = () => {
     }, [soundService]);
 
     return (
-        <>
+        <ErrorBoundary>
             <HeaderPanel title={'Rock Paper Scissors'}>
-                <SoundSettings 
+                <SoundSettings
                     settings={soundSettings}
                     onToggleSound={toggleSound}
                     onToggleMusic={toggleMusic}
@@ -30,8 +30,8 @@ export const RpsGamePage = () => {
                     <RpsGameSettings onStart={startGame} />
                 </CreateForm>
             )}
-            <GameContainer createGame={createGame}/>
+            <GameContainer containerRef={containerRef} />
             <FooterPanel />
-        </>
+        </ErrorBoundary>
     );
 };

@@ -1,3 +1,4 @@
+import { safeCall } from "../../utils/safe-call";
 import "./Button.css";
 import { ButtonProps } from "./types.js";
 
@@ -10,6 +11,7 @@ export const Button = ({
     children,
     className,
     disabled,
+    onClick,
     ...restProps
 }: ButtonProps) => {
     const classes = [
@@ -24,10 +26,21 @@ export const Button = ({
         .filter(Boolean)
         .join(" ");
 
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        if (onClick) {
+            safeCall(
+                () => onClick(event),
+                { component: 'Button', method: 'onClick' },
+                false
+            );
+        }
+    };
+
     return (
         <button
             className={classes}
             disabled={disabled || loading}
+            onClick={handleClick}
             {...restProps}
         >
             {loading ? (

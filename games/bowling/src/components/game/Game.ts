@@ -5,17 +5,15 @@ import BowlingGameData from './data/bowling-game-data.js';
 import BowlingGameflow from './flow/bowling-gameflow.js';
 import { ScaleManager } from "./utils/scale.js";
 import { GameEvents, GameStates, SoundService } from '@parity-games/core';
-import { Game } from '@parity-games/ui';
-import { BowlingGameSettings } from './types.js';
+import { BowlingGameSettings, Game } from './types.js';
 
 export class BowlingGame implements Game {
-    #app!: Application;
-    #gameScene!: BowlingScene;
-    #gameData!: BowlingGameData;
-    #gameflow!: BowlingGameflow;
-    #sceneReady!: Promise<BowlingScene>;
-    #scaleManager!: ScaleManager;
-    #isInitializing: boolean = false;
+    #app: Application | null = null;
+    #gameScene: BowlingScene | null = null;
+    #gameData: BowlingGameData | null = null;
+    #gameflow: BowlingGameflow | null = null;
+    #sceneReady: Promise<BowlingScene | null> | null = null;
+    #scaleManager: ScaleManager | null = null;
     #abortController: AbortController | null = null;
     #soundService: SoundService;
 
@@ -24,29 +22,15 @@ export class BowlingGame implements Game {
 	}
 
     async init(parent: HTMLDivElement) {
-        if (this.#app && this.#gameScene && this.#app.renderer) {
-            return this;
-        }
-    
-        if (this.#isInitializing) {
-            try {
-                await this.#sceneReady;
-                return this;
-            } catch { }
-        }
-    
-        if (this.#app) {
-            this.destroy();
-        }
-    
-        this.#isInitializing = true;
         this.#abortController = new AbortController();
         const signal = this.#abortController.signal;
-    
+
         this.#app = new Application();
-    
+
         this.#sceneReady = (async () => {
             try {
+                if (!this.#app) return null;
+
                 await this.#app.init({
                     backgroundColor: 0x000000,
                     resolution: window.devicePixelRatio || 1,
@@ -55,103 +39,66 @@ export class BowlingGame implements Game {
                     resizeTo: parent,
                     autoStart: false
                 });
-    
-                if (signal.aborted || !this.#app) {
-                    return null as any;
-                }
-    
-                await this.#waitForRenderer(signal);
-    
-                if (signal.aborted || !this.#app) {
-                    return null as any;
-                }
-    
-                parent.appendChild(this.#app.renderer.canvas);
-    
+
+                if (signal.aborted) return null;
+
+                if (!this.#app.canvas) return null;
+				parent.appendChild(this.#app.canvas);
+
                 this.#scaleManager = new ScaleManager(this.#app, parent, 1280, 768, 'contain');
-    
+
                 this.#gameScene = new BowlingScene(this.#app, this.#soundService, this.#scaleManager.scale);
                 this.#app.stage.addChild(this.#gameScene);
                 await this.#gameScene.create();
-    
-                if (this.#app.ticker && !this.#app.ticker.started) {
-                    this.#app.ticker.start();
-                }
-    
-                this.#gameData = new BowlingGameData(GameStates.INIT);
-    
-                if (this.#gameflow) {
-                    this.#gameflow.cleanupEventHandlers();
-                    this.#gameflow = null as any;
-                }
-    
-                this.#gameflow = new BowlingGameflow(this.#gameData, this.#gameScene as IBowlingScene);
-    
-                this.#scaleManager.onResize((scale, w, h) => {
-                    this.#gameScene.onResize(scale, w, h);
-                });
-    
-                this.#isInitializing = false;
-                this.#abortController = null;
+
+                if (!signal.aborted) {
+					this.#app.ticker.start();
+					this.#gameData = new BowlingGameData(GameStates.INIT);
+					this.#gameflow = new BowlingGameflow(this.#gameData, this.#gameScene as IBowlingScene);
+				}
+
+                if (this.#scaleManager) {
+					this.#scaleManager.onResize((scale, w, h) => {
+						if (!signal.aborted && this.#gameScene) {
+							this.#gameScene.onResize(scale, w, h);
+						}
+					});
+				}
 
                 return this.#gameScene;
             } catch (error) {
-                this.#isInitializing = false;
-                this.#abortController = null;
-
                 if (signal.aborted) {
-                    return null as any;
-                }
-
-                throw error;
+					return null;
+				}
+				throw error;
             }
         })();
-    
-        try {
-            await this.#sceneReady;
-            if (!this.#app || !this.#gameScene) {
-                return this;
-            }
-        } catch (error) {
-            if (!signal.aborted) {
-                throw error;
-            }
-        }
-        
+
         return this;
     }
 
-    #waitForRenderer(signal?: AbortSignal): Promise<void> {
-        return new Promise((resolve) => {
-            const checkRenderer = () => {
-                if (signal?.aborted || !this.#app) {
-                    resolve();
-                    return;
-                }
-    
-                if (this.#app.renderer && this.#app.renderer.canvas) {
-                    resolve();
-                } else {
-                    requestAnimationFrame(checkRenderer);
-                }
-            };
-            checkRenderer();
-        });
-    }
-
     get scene(): IBowlingScene {
+        if (!this.#gameScene) {
+            throw new Error('Scene not initialized');
+        }
         return this.#gameScene as IBowlingScene;
     }
 
-    get whenReady(): Promise<BowlingScene> {
+    get whenReady(): Promise<BowlingScene | null> {
+        if (!this.#sceneReady) {
+            throw new Error('Game not initialized');
+        }
         return this.#sceneReady;
     }
 
     async setGameSettings(settings: BowlingGameSettings): Promise<void> {
         await this.whenReady;
+        if (!this.#gameflow) {
+            throw new Error('Gameflow not initialized');
+        }
         this.#gameflow.setGameSettings(settings);
     }
-    
+
     async startGame(): Promise<void> {
         await this.emit(GameEvents.GAME_STARTED);
     }
@@ -189,41 +136,42 @@ export class BowlingGame implements Game {
             this.#abortController.abort();
             this.#abortController = null;
         }
-        
-        this.#isInitializing = false;
-        
+
         if (this.#app) {
-			if (this.#gameflow) {
-				this.#gameflow.destroy();
-			}
+            if (this.#app.ticker) {
+                this.#app.ticker.stop();
+            }
 
-			if (this.#gameScene) {
-				this.#gameScene.destroy();
-			}
+            if (this.#gameflow) {
+                this.#gameflow.destroy();
+                this.#gameflow = null;
+            }
 
-			if (this.#app.renderer && this.#app.canvas && this.#app.canvas.parentNode) {
-				this.#app.canvas.parentNode.removeChild(this.#app.canvas);
-			}
+            if (this.#gameScene) {
+                this.#gameScene.destroy();
+                this.#gameScene = null;
+            }
 
-			if (this.#scaleManager) {
-				this.#scaleManager.cleanup();
-			}
-			
-			this.#soundService.cleanup();
+            if (this.#app.renderer && this.#app.canvas && this.#app.canvas.parentNode) {
+                this.#app.canvas.parentNode.removeChild(this.#app.canvas);
+            }
 
-			if (this.#app.stage) {
-				this.#app.stage.removeAllListeners();
-			}
+            if (this.#scaleManager) {
+                this.#scaleManager.cleanup();
+                this.#scaleManager = null;
+            }
 
-			if (this.#app.renderer) {
-				this.#app.destroy(true);
-			}
-			this.#app = null as any;
-		}
-        
-        this.#gameScene = null as any;
-        this.#gameData = null as any;
-        this.#gameflow = null as any;
-        this.#scaleManager = null as any;
+            if (this.#app.stage) {
+                this.#app.stage.removeAllListeners();
+            }
+
+            if (this.#app.renderer) {
+                this.#app.destroy(true);
+            }
+            this.#app = null;
+        }
+
+        this.#sceneReady = null;
+        this.#gameData = null;
     }
 }
