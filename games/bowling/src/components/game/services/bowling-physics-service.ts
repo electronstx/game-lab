@@ -1,7 +1,7 @@
-import { IBowlingScene } from '../view/types.js';
-import { Ball } from '../view/game-objects/ball.js';
-import { PinManager } from '../view/game-objects/pin-manager.js';
-import { GuideLine } from '../view/game-objects/guide-line.js';
+import type { Ball } from '../view/game-objects/ball.js';
+import type { GuideLine } from '../view/game-objects/guide-line.js';
+import type { PinManager } from '../view/game-objects/pin-manager.js';
+import type { IBowlingScene } from '../view/types.js';
 
 export class BowlingPhysicsService {
     #scene: IBowlingScene;
@@ -32,38 +32,38 @@ export class BowlingPhysicsService {
 
     updateGameLoop(): void {
         if (!this.#isActive) return;
-    
+
         this.#guideLine.update();
-        
+
         const wasMoving = this.#ball.isMoving();
         this.#ball.update();
         const ballStillMoving = this.#ball.isMoving();
-        
+
         if (ballStillMoving) {
             const ballPosition = this.#ball.getPosition();
             const ballVelocity = this.#ball.getVelocity();
             const ballRadius = this.#ball.getRadius();
-            
+
             const originalVelocity = { ...ballVelocity };
-            
+
             this.#pinManager.checkBallCollision(ballPosition, ballRadius, ballVelocity);
-            
+
             const ballSpeed = Math.sqrt(ballVelocity.x ** 2 + ballVelocity.y ** 2);
             const originalSpeed = Math.sqrt(originalVelocity.x ** 2 + originalVelocity.y ** 2);
-            
+
             if (ballSpeed < originalSpeed) {
                 const newVelocity = {
                     x: ballVelocity.x * (1 - this.#ballVelocityLoss),
-                    y: ballVelocity.y * (1 - this.#ballVelocityLoss)
+                    y: ballVelocity.y * (1 - this.#ballVelocityLoss),
                 };
                 this.#ball.setVelocity(newVelocity);
             }
-            
+
             this.#pinManager.update();
         } else if (wasMoving) {
             this.#scene.getEventEmitter().emit('BALL_STOPPED');
         }
-        
+
         if (!ballStillMoving) {
             this.#pinManager.update();
         }
@@ -78,12 +78,12 @@ export class BowlingPhysicsService {
             this.#pinsSettlingTimer = window.setTimeout(() => {
                 const currentPinsKnockedDown = this.#pinManager.getKnockedDownCount();
                 const pinsKnockedDown = currentPinsKnockedDown - this.#pinsBeforeThrow;
-                
+
                 this.#scene.getEventEmitter().emit('PINS_SETTLED', {
                     pinsKnockedDown: pinsKnockedDown,
-                    totalKnockedDown: currentPinsKnockedDown
+                    totalKnockedDown: currentPinsKnockedDown,
                 });
-                
+
                 this.#pinsSettlingTimer = null;
             }, this.#pinsSettlingDelay);
         }

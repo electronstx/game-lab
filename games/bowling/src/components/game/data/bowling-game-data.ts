@@ -1,6 +1,6 @@
-import { GameData, GameStateName } from "@game-lab/core";
-import { ThrowResult, Frame, ScoreboardData } from "./types.js";
-import { isBowlingGameSettings } from "../utils/guards.js";
+import { GameData, type GameStateName } from '@game-lab/core';
+import { isBowlingGameSettings } from '../utils/guards.js';
+import type { Frame, ScoreboardData, ThrowResult } from './types.js';
 
 export default class BowlingGameData extends GameData {
     #player1Score: number = 0;
@@ -32,7 +32,7 @@ export default class BowlingGameData extends GameData {
             throw3: null,
             frameScore: null,
             isStrike: false,
-            isSpare: false
+            isSpare: false,
         }));
         this.#player2Frames = Array.from({ length: numberOfFrames }, () => ({
             throw1: null,
@@ -40,15 +40,15 @@ export default class BowlingGameData extends GameData {
             throw3: null,
             frameScore: null,
             isStrike: false,
-            isSpare: false
+            isSpare: false,
         }));
     }
 
-    override getGameData(): { numberOfFrames: number, playerScore: number, opponentScore: number } {
-        return { 
-            numberOfFrames: this.#getNumberOfFrames(), 
-            playerScore: this.#player1Score, 
-            opponentScore: this.#player2Score 
+    override getGameData(): { numberOfFrames: number; playerScore: number; opponentScore: number } {
+        return {
+            numberOfFrames: this.#getNumberOfFrames(),
+            playerScore: this.#player1Score,
+            opponentScore: this.#player2Score,
         };
     }
 
@@ -59,19 +59,19 @@ export default class BowlingGameData extends GameData {
     override getRoundResultData(): ThrowResult {
         const frames = this.#currentPlayer === 1 ? this.#player1Frames : this.#player2Frames;
         const frame = frames[this.#currentFrame];
-        
+
         const isStrike = this.#pinsKnockedDown === 10 && this.#currentThrow === 1;
-        
+
         let isSpare = false;
         if (this.#currentThrow === 2 && frame && frame.throw1 !== null) {
-            isSpare = frame.throw1 !== 10 && (frame.throw1 + this.#pinsKnockedDown === 10);
+            isSpare = frame.throw1 !== 10 && frame.throw1 + this.#pinsKnockedDown === 10;
         }
-    
+
         return {
             pinsKnockedDown: this.#pinsKnockedDown,
             totalPins: this.#totalPins,
             isStrike,
-            isSpare
+            isSpare,
         };
     }
 
@@ -87,36 +87,41 @@ export default class BowlingGameData extends GameData {
             currentFrame: this.#currentFrame,
             currentThrow: this.#currentThrow,
             player1TotalScore: this.#player1Score,
-            player2TotalScore: this.#player2Score
+            player2TotalScore: this.#player2Score,
         };
     }
 
     setThrowResult(pinsKnockedDown: number): void {
-        if (!Number.isInteger(pinsKnockedDown) || pinsKnockedDown < 0 || pinsKnockedDown > 10) return;
+        if (!Number.isInteger(pinsKnockedDown) || pinsKnockedDown < 0 || pinsKnockedDown > 10)
+            return;
 
         this.#pinsKnockedDown = pinsKnockedDown;
         const frames = this.#currentPlayer === 1 ? this.#player1Frames : this.#player2Frames;
         const frame = frames[this.#currentFrame];
-        
+
         if (!frame) return;
-    
+
         if (this.#currentThrow === 1) {
             frame.throw1 = pinsKnockedDown;
             frame.isStrike = pinsKnockedDown === 10;
-            
+
             if (frame.isStrike && !this.#isLastFrame()) {
             } else {
                 this.#currentThrow = 2;
             }
         } else if (this.#currentThrow === 2) {
             frame.throw2 = pinsKnockedDown;
-            
-            if (frame.throw1 !== null && frame.throw1 !== 10 && (frame.throw1 + pinsKnockedDown === 10)) {
+
+            if (
+                frame.throw1 !== null &&
+                frame.throw1 !== 10 &&
+                frame.throw1 + pinsKnockedDown === 10
+            ) {
                 frame.isSpare = true;
             } else {
                 frame.isSpare = false;
             }
-            
+
             if (!this.#isLastFrame()) {
             } else {
                 const firstThrowWasStrike = frame.throw1 === 10;
@@ -130,9 +135,9 @@ export default class BowlingGameData extends GameData {
             frame.throw3 = pinsKnockedDown;
             this.#calculateFrameScore(this.#currentFrame, frames);
         }
-    
+
         this.#recalculateScores(frames);
-    
+
         const frameCompleted = this.#isFrameCompleted(frame, this.#currentFrame);
         if (frameCompleted) {
             this.#switchPlayer();
@@ -149,10 +154,9 @@ export default class BowlingGameData extends GameData {
 
     #isFrameCompleted(frame: Frame, frameIndex?: number): boolean {
         const numberOfFrames = this.#getNumberOfFrames();
-        const isLastFrame = frameIndex !== undefined 
-            ? frameIndex === numberOfFrames - 1
-            : this.#isLastFrame();
-        
+        const isLastFrame =
+            frameIndex !== undefined ? frameIndex === numberOfFrames - 1 : this.#isLastFrame();
+
         if (!isLastFrame) {
             return frame.isStrike || (frame.throw1 !== null && frame.throw2 !== null);
         } else {
@@ -248,7 +252,10 @@ export default class BowlingGameData extends GameData {
         for (let i = 0; i < frames.length; i++) {
             const frame = frames[i];
 
-            if (frame && (frame.throw1 !== null || frame.throw2 !== null || frame.throw3 !== null)) {
+            if (
+                frame &&
+                (frame.throw1 !== null || frame.throw2 !== null || frame.throw3 !== null)
+            ) {
                 this.#calculateFrameScore(i, frames);
             }
         }
@@ -268,10 +275,10 @@ export default class BowlingGameData extends GameData {
         const lastFrameIndex = numberOfFrames - 1;
         const player1LastFrame = this.#player1Frames[lastFrameIndex];
         const player2LastFrame = this.#player2Frames[lastFrameIndex];
-        
+
         const player1Completed = this.#isFrameCompleted(player1LastFrame, lastFrameIndex);
         const player2Completed = this.#isFrameCompleted(player2LastFrame, lastFrameIndex);
-        
+
         if (player1Completed && player2Completed) {
             if (this.#player1Score > this.#player2Score) {
                 return 'Player 1 wins!';
@@ -281,39 +288,35 @@ export default class BowlingGameData extends GameData {
                 return 'Tie game!';
             }
         }
-        
+
         return null;
     }
 
     shouldResetAllPins(): boolean {
-        const frames = this.#currentPlayer === 1 
-            ? this.#player1Frames 
-            : this.#player2Frames;
+        const frames = this.#currentPlayer === 1 ? this.#player1Frames : this.#player2Frames;
         const frame = frames[this.#currentFrame];
-    
+
         if (this.#currentThrow === 1) {
             return true;
         }
-        
+
         if (this.#currentThrow === 2 && this.#isLastFrame() && frame?.throw1 === 10) {
             return true;
         }
-        
+
         if (this.#currentThrow === 3 && this.#isLastFrame()) {
             return true;
         }
-        
+
         return false;
     }
 
     canProcessThrowResult(): boolean {
-        const frames = this.#currentPlayer === 1 
-            ? this.#player1Frames 
-            : this.#player2Frames;
+        const frames = this.#currentPlayer === 1 ? this.#player1Frames : this.#player2Frames;
         const frame = frames[this.#currentFrame];
-        
+
         if (!frame) return false;
-        
+
         const currentThrow = this.#currentThrow;
         return !(
             (currentThrow === 1 && frame.throw1 !== null) ||

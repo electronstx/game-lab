@@ -1,6 +1,6 @@
-import { safeCall } from "../../utils/safe-call";
-import "./Button.css";
-import { ButtonProps } from "./types.js";
+import { safeCall } from '../../utils/safe-call';
+import './Button.css';
+import type { ButtonProps } from './types.js';
 
 export const Button = ({
     size,
@@ -15,24 +15,20 @@ export const Button = ({
     ...restProps
 }: ButtonProps) => {
     const classes = [
-        "game-button",
+        'game-button',
         size,
         color,
-        block && "block",
-        loading && "loading",
-        !children && icon && "icon",
+        block && 'block',
+        loading && 'loading',
+        !children && icon && 'icon',
         className,
     ]
         .filter(Boolean)
-        .join(" ");
+        .join(' ');
 
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         if (onClick) {
-            safeCall(
-                () => onClick(event),
-                { component: 'Button', method: 'onClick' },
-                false
-            );
+            safeCall(() => onClick(event), { component: 'Button', method: 'onClick' }, false);
         }
     };
 

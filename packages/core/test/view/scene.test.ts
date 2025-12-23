@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import Scene from '../../src/view/scene.js';
 import * as PIXI from 'pixi.js';
-import { SoundService } from '../../src/services/sound/sound-service.js';
-import { EventEmitter } from '../../src/data/events.js';
-import { HUD } from '../../src/view/hud/hud.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { EventEmitter } from '../../src/data/events.js';
+import type { SoundService } from '../../src/services/sound/sound-service.js';
 import { AnimationManager } from '../../src/view/animations/animation-manager.js';
 import { GameObjects } from '../../src/view/game-objects/game-objects.js';
+import { HUD } from '../../src/view/hud/hud.js';
+import Scene from '../../src/view/scene.js';
 
 class TestScene extends Scene {
     create(): void {}
@@ -140,7 +140,8 @@ describe('Scene', () => {
 
             expect(stageWithoutOnce.on).toHaveBeenCalled();
 
-            const registeredHandler = (stageWithoutOnce.on as ReturnType<typeof vi.fn>).mock.calls[0][1];
+            const registeredHandler = (stageWithoutOnce.on as ReturnType<typeof vi.fn>).mock
+                .calls[0][1];
             expect(typeof registeredHandler).toBe('function');
         });
 
@@ -153,7 +154,7 @@ describe('Scene', () => {
             const testScene = new TestScene(invalidApp, mockSoundService, 1);
 
             expect(() => testScene.getEventEmitter()).toThrow(
-                'PIXI.Application stage does not implement EventEmitter interface'
+                'PIXI.Application stage does not implement EventEmitter interface',
             );
         });
     });

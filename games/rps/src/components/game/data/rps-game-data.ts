@@ -1,6 +1,6 @@
-import { GameData, GameStateName } from "@game-lab/core";
-import { RoundResultData } from "./types";
-import { isNumber } from "../utils/guards";
+import { GameData, type GameStateName } from '@game-lab/core';
+import { isNumber } from '../utils/guards';
+import type { RoundResultData } from './types';
 
 export default class RpsGameData extends GameData {
     #playerScore: number = 0;
@@ -16,7 +16,7 @@ export default class RpsGameData extends GameData {
         this.#playerMove = playerMove;
     }
 
-    override getGameData(): { playerScore: number, opponentScore: number } {
+    override getGameData(): { playerScore: number; opponentScore: number } {
         return { playerScore: this.#playerScore, opponentScore: this.#opponentScore };
     }
 
@@ -33,19 +33,19 @@ export default class RpsGameData extends GameData {
         const opponentMove = moves[Math.floor(Math.random() * moves.length)];
 
         const roundWinner = this.determineWinner(this.#playerMove, opponentMove);
-        
+
         this.updateScores(roundWinner);
 
         return {
-            playerMove: this.#playerMove, 
-            opponentMove: opponentMove, 
-            playerScore: this.#playerScore, 
-            opponentScore: this.#opponentScore, 
+            playerMove: this.#playerMove,
+            opponentMove: opponentMove,
+            playerScore: this.#playerScore,
+            opponentScore: this.#opponentScore,
             roundWinner: roundWinner,
-            result: this.checkEndGame() 
+            result: this.checkEndGame(),
         };
     }
-    
+
     override resetData(): void {
         this.#playerScore = 0;
         this.#opponentScore = 0;
@@ -57,13 +57,15 @@ export default class RpsGameData extends GameData {
         if (playerMove === opponentMove) {
             return 'tie';
         }
-    
-        if ((playerMove === 'rock' && opponentMove === 'scissors')
-            || (playerMove === 'scissors' && opponentMove === 'paper')
-            || (playerMove === 'paper' && opponentMove === 'rock')) {
+
+        if (
+            (playerMove === 'rock' && opponentMove === 'scissors') ||
+            (playerMove === 'scissors' && opponentMove === 'paper') ||
+            (playerMove === 'paper' && opponentMove === 'rock')
+        ) {
             return 'player';
         }
-        
+
         return 'opponent';
     }
 
@@ -81,8 +83,10 @@ export default class RpsGameData extends GameData {
 
         const winsNeeded = Math.ceil(bestOf / 2);
 
-        return this.#playerScore === winsNeeded ? 'Player wins!'
-            : this.#opponentScore === winsNeeded ? 'Opponent wins!'
-            : null;
+        return this.#playerScore === winsNeeded
+            ? 'Player wins!'
+            : this.#opponentScore === winsNeeded
+              ? 'Opponent wins!'
+              : null;
     }
 }

@@ -1,15 +1,15 @@
-import { GameEvents, Scene, SoundService } from '@game-lab/core';
+import { GameEvents, Scene, type SoundService } from '@game-lab/core';
 import * as PIXI from 'pixi.js';
-import { Scoreboard } from './hud/scoreboard.js';
-import { Lane } from './game-objects/lane.js';
-import { GuideLine } from './game-objects/guide-line.js';
-import { Ball } from './game-objects/ball.js';
-import { PinManager } from './game-objects/pin-manager.js';
-import { StartScreenAnimation } from './animations/start-screen-animation.js';
-import { IBowlingScene } from './types.js';
-import { ScoreboardData } from '../data/types.js';
-import { EndGameAnimation } from './animations/end-game-animation.js';
+import type { ScoreboardData } from '../data/types.js';
 import { BowlingPhysicsService } from '../services/bowling-physics-service.js';
+import { EndGameAnimation } from './animations/end-game-animation.js';
+import { StartScreenAnimation } from './animations/start-screen-animation.js';
+import { Ball } from './game-objects/ball.js';
+import { GuideLine } from './game-objects/guide-line.js';
+import { Lane } from './game-objects/lane.js';
+import { PinManager } from './game-objects/pin-manager.js';
+import { Scoreboard } from './hud/scoreboard.js';
+import type { IBowlingScene } from './types.js';
 
 export default class BowlingScene extends Scene implements IBowlingScene {
     #scoreboard: Scoreboard;
@@ -59,7 +59,7 @@ export default class BowlingScene extends Scene implements IBowlingScene {
             this,
             this.#ball,
             this.#pinManager,
-            this.#guideLine
+            this.#guideLine,
         );
 
         this.#setupGameLoop();
@@ -81,16 +81,17 @@ export default class BowlingScene extends Scene implements IBowlingScene {
 
     #onPointerDown(): void {
         this.getEventEmitter().emit('USER_INPUT_BALL_LAUNCH', {
-            angle: this.#guideLine.getAngle()
+            angle: this.#guideLine.getAngle(),
         });
     }
 
-    override onResize(scale: number, width: number, height: number): void {
-        
-    }
+    override onResize(scale: number, width: number, height: number): void {}
 
     override showStartScreen(): void {
-        this.animationManager.show(this.#startScreenAnimation, 'Choose number of frames\n and start the game!');
+        this.animationManager.show(
+            this.#startScreenAnimation,
+            'Choose number of frames\n and start the game!',
+        );
     }
 
     override initHUD(numberOfFrames: number, playerScore: number, opponentScore: number): void {
@@ -106,10 +107,14 @@ export default class BowlingScene extends Scene implements IBowlingScene {
         this.getEventEmitter().emit(GameEvents.ROUND_STARTED);
     }
 
-    override showRound(roundNumber?: number, currentPlayer?: number, shouldResetAllPins: boolean = true): void {
+    override showRound(
+        roundNumber?: number,
+        currentPlayer?: number,
+        shouldResetAllPins: boolean = true,
+    ): void {
         this.#guideLine.startRotation();
         this.#ball.reset();
-        
+
         if (shouldResetAllPins) {
             this.#pinManager.reset();
         } else {
@@ -124,7 +129,7 @@ export default class BowlingScene extends Scene implements IBowlingScene {
 
     override showRoundResult(...args: any[]): void {
         const resultData = args[0];
-    
+
         if (resultData) {
             // Визуализация результата раунда
             if (resultData.isStrike) {
@@ -178,9 +183,9 @@ export default class BowlingScene extends Scene implements IBowlingScene {
         }
 
         this.app.stage.off('pointerdown', this.#onPointerDown, this);
-        
+
         this.gameObjects.destroy();
-        
+
         super.destroy();
     }
 

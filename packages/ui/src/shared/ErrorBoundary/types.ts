@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
 import type { GameError } from '@game-lab/errors';
+import type { ReactNode } from 'react';
 
 export type ErrorBoundaryProps = {
     children: ReactNode;

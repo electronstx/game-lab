@@ -75,13 +75,21 @@
 }
 
 .game-button.profile {
-    background: linear-gradient(135deg, var(--profile-color, #9c27b0) 0%, var(--profile-color-dark, #7b1fa2) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--profile-color, #9c27b0) 0%,
+        var(--profile-color-dark, #7b1fa2) 100%
+    );
     border-color: var(--profile-color-dark, #7b1fa2);
     color: #ffffff;
 }
 
 .game-button.profile:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--profile-color-dark, #7b1fa2) 0%, var(--profile-color-darker, #6a1b9a) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--profile-color-dark, #7b1fa2) 0%,
+        var(--profile-color-darker, #6a1b9a) 100%
+    );
     border-color: var(--profile-color-darker, #6a1b9a);
 }
 

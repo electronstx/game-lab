@@ -1,5 +1,5 @@
+import type { GameObject, Scene } from '@game-lab/core';
 import * as PIXI from 'pixi.js';
-import { GameObject, Scene } from '@game-lab/core';
 
 export class Ball implements GameObject {
     #sprite: PIXI.Graphics;
@@ -41,7 +41,7 @@ export class Ball implements GameObject {
         this.#isMoving = true;
         this.#velocity = {
             x: Math.cos(angle) * this.#speed,
-            y: Math.sin(angle) * this.#speed
+            y: Math.sin(angle) * this.#speed,
         };
     }
 
@@ -56,8 +56,12 @@ export class Ball implements GameObject {
 
         this.#sprite.position.set(this.#position.x, this.#position.y);
 
-        if (this.#position.x < 0 || this.#position.x > this.#width ||
-            this.#position.y < 0 || this.#position.y > this.#height) {
+        if (
+            this.#position.x < 0 ||
+            this.#position.x > this.#width ||
+            this.#position.y < 0 ||
+            this.#position.y > this.#height
+        ) {
             this.reset();
             return;
         }
@@ -99,11 +103,11 @@ export class Ball implements GameObject {
     show(): void {
         this.#sprite.visible = true;
     }
-    
+
     hide(): void {
         this.#sprite.visible = false;
     }
-    
+
     destroy(): void {
         this.#sprite.destroy();
     }

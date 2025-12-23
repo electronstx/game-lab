@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import "./ButtonGroup.css";
-import { ButtonGroupProps, Option } from "./types.js";
-import { safeCall } from "../../utils/safe-call";
+import { useEffect, useState } from 'react';
+import './ButtonGroup.css';
+import { safeCall } from '../../utils/safe-call';
+import type { ButtonGroupProps, Option } from './types.js';
 
 export const ButtonGroup = ({
     name,
@@ -9,7 +9,7 @@ export const ButtonGroup = ({
     defaultValue,
     options = [],
     disabled = false,
-    onChange
+    onChange,
 }: ButtonGroupProps) => {
     const isControlled = value !== undefined;
     const initialValue = value ?? defaultValue;
@@ -20,7 +20,7 @@ export const ButtonGroup = ({
             safeCall(
                 () => setCurrentValue(value),
                 { component: 'ButtonGroup', method: 'useEffect' },
-                true
+                true,
             );
         }
     }, [value, isControlled]);
@@ -35,15 +35,11 @@ export const ButtonGroup = ({
             safeCall(
                 () => setCurrentValue(option.value),
                 { component: 'ButtonGroup', method: 'setCurrentValue' },
-                true
+                true,
             );
         }
 
-        safeCall(
-            () => onChange?.(option),
-            { component: 'ButtonGroup', method: 'onChange' },
-            false
-        );
+        safeCall(() => onChange?.(option), { component: 'ButtonGroup', method: 'onChange' }, false);
     };
 
     const activeValue = isControlled ? value : currentValue;

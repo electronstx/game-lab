@@ -1,8 +1,8 @@
-import { ChoiceConfig } from './types';
-import { GameEvents, HUDComponent } from "@game-lab/core";
-import RpsScene from "../rps-scene";
+import { GameEvents, type HUDComponent } from '@game-lab/core';
 import * as PIXI from 'pixi.js';
 import { playClickSound, playHoverSound } from '../../sounds';
+import type RpsScene from '../rps-scene';
+import type { ChoiceConfig } from './types';
 
 export class ChoicePanel implements HUDComponent {
     #scene: RpsScene;
@@ -11,7 +11,7 @@ export class ChoicePanel implements HUDComponent {
     #choiceConfigs: ChoiceConfig[] = [
         { name: 'rock', offsetX: -408 },
         { name: 'paper', offsetX: 0 },
-        { name: 'scissors', offsetX: 408 }
+        { name: 'scissors', offsetX: 408 },
     ];
 
     constructor(scene: RpsScene) {
@@ -20,7 +20,8 @@ export class ChoicePanel implements HUDComponent {
 
     create(scale: number): void {
         this.#choicePanelBack = new PIXI.Graphics();
-        this.#choicePanelBack.rect(0, 0, this.#scene.app.renderer.width, this.#scene.app.renderer.height)
+        this.#choicePanelBack
+            .rect(0, 0, this.#scene.app.renderer.width, this.#scene.app.renderer.height)
             .fill({ color: 0x000000, alpha: 0.8 });
         this.#choicePanelBack.visible = false;
         this.#choicePanelBack.eventMode = 'passive';
@@ -34,7 +35,7 @@ export class ChoicePanel implements HUDComponent {
             choice.anchor.set(0.5);
             choice.x = config.offsetX * scale;
             choice.scale.set(0.8 * scale);
-            choice.tint = 0xEEEEEE;
+            choice.tint = 0xeeeeee;
 
             choice.eventMode = 'static';
             choice.cursor = 'pointer';
@@ -45,16 +46,19 @@ export class ChoicePanel implements HUDComponent {
             });
             choice.on('pointerenter', () => {
                 playHoverSound(this.#scene.soundService);
-                choice.tint = 0xFFFFFF;
+                choice.tint = 0xffffff;
             });
             choice.on('pointerleave', () => {
-                choice.tint = 0xEEEEEE;
+                choice.tint = 0xeeeeee;
             });
 
             this.#choicePanel?.addChild(choice);
         });
-        
-        this.#choicePanel.position.set(this.#scene.app.renderer.width / 2, this.#scene.app.renderer.height / 2);
+
+        this.#choicePanel.position.set(
+            this.#scene.app.renderer.width / 2,
+            this.#scene.app.renderer.height / 2,
+        );
         this.#choicePanel.visible = false;
 
         this.#scene.addChild(this.#choicePanel);

@@ -1,7 +1,7 @@
 export { CreateForm } from './features/CreateForm/CreateForm.js';
 export { FooterPanel } from './features/FooterPanel/FooterPanel.js';
-export { HeaderPanel } from './features/HeaderPanel/HeaderPanel.js';
 export { GameContainer } from './features/GameContainer/GameContainer.js';
+export { HeaderPanel } from './features/HeaderPanel/HeaderPanel.js';
 export { SoundSettings } from './features/SoundSettings/SoundSettings.js';
 export type { SoundSettingsProps } from './features/SoundSettings/types.js';
 

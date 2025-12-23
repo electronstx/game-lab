@@ -1,8 +1,8 @@
-import { HUDComponent } from "@game-lab/core";
-import RpsScene from "../rps-scene";
+import type { HUDComponent } from '@game-lab/core';
 import * as PIXI from 'pixi.js';
-import { RoundResultData } from "../../data/types";
-import { isRoundResultData } from "../../utils/guards";
+import type { RoundResultData } from '../../data/types';
+import { isRoundResultData } from '../../utils/guards';
+import type RpsScene from '../rps-scene';
 
 export class Score implements HUDComponent {
     #scene: RpsScene;
@@ -17,20 +17,20 @@ export class Score implements HUDComponent {
     }
 
     create(scale: number): void {
-		const halfH = this.#scene.app.renderer.height / 2;
-		const offsetX = 200 * scale;
+        const halfH = this.#scene.app.renderer.height / 2;
+        const offsetX = 200 * scale;
         const offsetY = 50 * scale;
 
         const textStyle = new PIXI.TextStyle({
-			fontFamily: 'Arial',
-			fontSize: 80 * scale,
-			fill: 'white',
-			align: 'center',
-			stroke: {
+            fontFamily: 'Arial',
+            fontSize: 80 * scale,
+            fill: 'white',
+            align: 'center',
+            stroke: {
                 color: '#050b2c',
-                width: 4
-            }
-		});
+                width: 4,
+            },
+        });
 
         this.#playerScoreBack = PIXI.Sprite.from('playerScore');
         this.#playerScoreBack.anchor.set(0.5);
@@ -82,23 +82,25 @@ export class Score implements HUDComponent {
     }
 
     updateScores(roundResultData: RoundResultData): void {
-		this.#playerScore && (this.#playerScore.text = `${roundResultData.playerScore}`);
+        this.#playerScore && (this.#playerScore.text = `${roundResultData.playerScore}`);
         this.#opponentScore && (this.#opponentScore.text = `${roundResultData.opponentScore}`);
-	}
+    }
 
-    setScore(playerScore: number, opponentScore: number): void{
-		this.#playerScore && (this.#playerScore.text = `${playerScore}`);
-		this.#opponentScore && (this.#opponentScore.text = `${opponentScore}`);
-	}
+    setScore(playerScore: number, opponentScore: number): void {
+        this.#playerScore && (this.#playerScore.text = `${playerScore}`);
+        this.#opponentScore && (this.#opponentScore.text = `${opponentScore}`);
+    }
 
-	resetScore(): void {
-		this.#playerScore && (this.#playerScore.text = '0');
-		this.#opponentScore && (this.#opponentScore.text = '0');
-	}
+    resetScore(): void {
+        this.#playerScore && (this.#playerScore.text = '0');
+        this.#opponentScore && (this.#opponentScore.text = '0');
+    }
 
     destroy(): void {
         if (this.#animationCompletedHandler) {
-            this.#scene.getEventEmitter().off('ANIMATION_COMPLETED', this.#animationCompletedHandler);
+            this.#scene
+                .getEventEmitter()
+                .off('ANIMATION_COMPLETED', this.#animationCompletedHandler);
             this.#animationCompletedHandler = undefined;
         }
     }

@@ -1,4 +1,4 @@
-import type { GameObject } from "./types";
+import type { GameObject } from './types';
 
 export class GameObjects {
     #objects: Array<GameObject> = [];
@@ -12,7 +12,7 @@ export class GameObjects {
     create(...args: unknown[]): void {
         if (this.#objects.length === 0) return;
 
-        this.#objects.forEach(obj => {
+        this.#objects.forEach((obj) => {
             if (obj?.create) {
                 obj.create(...args);
             }
@@ -22,7 +22,7 @@ export class GameObjects {
     show(): void {
         if (this.#objects.length === 0) return;
 
-        this.#objects.forEach(obj => {
+        this.#objects.forEach((obj) => {
             if (obj?.show) {
                 obj.show();
             }
@@ -32,7 +32,7 @@ export class GameObjects {
     hide(): void {
         if (this.#objects.length === 0) return;
 
-        this.#objects.forEach(obj => {
+        this.#objects.forEach((obj) => {
             if (obj?.hide) {
                 obj.hide();
             }
@@ -42,7 +42,7 @@ export class GameObjects {
     update(): void {
         if (this.#objects.length === 0) return;
 
-        this.#objects.forEach(obj => {
+        this.#objects.forEach((obj) => {
             if (obj?.update) {
                 obj.update();
             }
@@ -52,7 +52,7 @@ export class GameObjects {
     reset(): void {
         if (this.#objects.length === 0) return;
 
-        this.#objects.forEach(obj => {
+        this.#objects.forEach((obj) => {
             if (obj?.reset) {
                 obj.reset();
             }
@@ -62,7 +62,7 @@ export class GameObjects {
     destroy(): void {
         if (this.#objects.length === 0) return;
 
-        this.#objects.forEach(obj => {
+        this.#objects.forEach((obj) => {
             if (obj?.destroy) {
                 obj.destroy();
             }

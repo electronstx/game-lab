@@ -16,7 +16,7 @@ export interface SocialLink {
     icon: string;
 }
 
-export const SOCIAL_LINKS: SocialLink[] = [    
+export const SOCIAL_LINKS: SocialLink[] = [
     {
         name: 'Telegram',
         url: 'https://t.me/electronstx',

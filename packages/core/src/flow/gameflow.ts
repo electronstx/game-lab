@@ -1,10 +1,24 @@
-import { ErrorCategory, ErrorSeverity, GameError, handleError, handleErrorSilently, InitializationError, StateError } from "@game-lab/errors";
-import { GameEndEvent, GameEvents, EventEmitter, RoundCompletedEvent, RoundStartedEvent } from "../data/events.js";
-import GameData from "../data/game-data.js";
-import { GameStateName, GameStates, StateEnterData } from "../data/types.js";
-import { isGameEndEvent, isRoundCompletedEvent } from "../utils/guards.js";
-import Scene from "../view/scene.js";
-import { safeCleanup } from "../utils/cleanup.js";
+import {
+    ErrorCategory,
+    ErrorSeverity,
+    GameError,
+    handleError,
+    handleErrorSilently,
+    InitializationError,
+    StateError,
+} from '@game-lab/errors';
+import {
+    type EventEmitter,
+    GameEndEvent,
+    GameEvents,
+    RoundCompletedEvent,
+    RoundStartedEvent,
+} from '../data/events.js';
+import type GameData from '../data/game-data.js';
+import { type GameStateName, GameStates, type StateEnterData } from '../data/types.js';
+import { safeCleanup } from '../utils/cleanup.js';
+import { isGameEndEvent, isRoundCompletedEvent } from '../utils/guards.js';
+import type Scene from '../view/scene.js';
 
 export default abstract class Gameflow {
     protected gameData: GameData;
@@ -20,7 +34,7 @@ export default abstract class Gameflow {
         } catch (error) {
             const initializationError = new InitializationError(
                 'Failed to get event emitter from scene',
-                { component: 'Gameflow', method: 'constructor', originalError: error }
+                { component: 'Gameflow', method: 'constructor', originalError: error },
             );
             handleError(initializationError);
             throw initializationError;
@@ -77,11 +91,11 @@ export default abstract class Gameflow {
                     break;
             }
         } catch (error) {
-            const stateError = new StateError(
-                `Failed to enter state "${stateName}"`,
-                stateName,
-                { component: 'Gameflow', method: '#enterState', originalError: error }
-            );
+            const stateError = new StateError(`Failed to enter state "${stateName}"`, stateName, {
+                component: 'Gameflow',
+                method: '#enterState',
+                originalError: error,
+            });
             handleError(stateError);
         }
     }
@@ -91,11 +105,11 @@ export default abstract class Gameflow {
             this.gameData.changeState(newState, data ? { stateData: data } : undefined);
             this.#enterState(newState, data);
         } catch (error) {
-            const stateError = new StateError(
-                `Failed to change state to "${newState}"`,
-                newState,
-                { component: 'Gameflow', method: '#changeState', originalError: error }
-            );
+            const stateError = new StateError(`Failed to change state to "${newState}"`, newState, {
+                component: 'Gameflow',
+                method: '#changeState',
+                originalError: error,
+            });
             handleError(stateError);
         }
     }
@@ -127,9 +141,10 @@ export default abstract class Gameflow {
             if (typeof data === 'string' || (typeof data === 'object' && data !== null)) {
                 const roundNumber = this.gameData.getRoundData();
                 this.#changeState(GameStates.ROUND_RESULT, {
-                    resultData: typeof data === 'string'
-                        ? { playerMove: data, roundNumber }
-                        : { ...data, roundNumber }
+                    resultData:
+                        typeof data === 'string'
+                            ? { playerMove: data, roundNumber }
+                            : { ...data, roundNumber },
                 });
                 return;
             }
@@ -140,12 +155,14 @@ export default abstract class Gameflow {
             const data = args[0];
 
             if (isGameEndEvent(data)) {
-                const payload = data.payload && typeof data.payload === 'object' ? data.payload : {};
+                const payload =
+                    data.payload && typeof data.payload === 'object' ? data.payload : {};
                 this.#changeState(GameStates.END, {
                     result: 'result' in payload ? payload.result : data,
-                    timescale: 'timescale' in payload && typeof payload.timescale === 'number'
-                        ? payload.timescale
-                        : undefined
+                    timescale:
+                        'timescale' in payload && typeof payload.timescale === 'number'
+                            ? payload.timescale
+                            : undefined,
                 });
                 return;
             }
@@ -164,7 +181,7 @@ export default abstract class Gameflow {
         this.setupCustomEventHandlers();
     }
 
-    protected setupCustomEventHandlers(): void { }
+    protected setupCustomEventHandlers(): void {}
 
     protected subscribe(event: string, handler: (...args: unknown[]) => void): void {
         const wrappedHandler = (...args: unknown[]) => {
@@ -176,7 +193,7 @@ export default abstract class Gameflow {
                     ErrorSeverity.HIGH,
                     ErrorCategory.EVENT,
                     { component: 'Gameflow', method: 'subscribe', event, originalError: error },
-                    true
+                    true,
                 );
                 handleError(gameError);
             }
@@ -202,7 +219,7 @@ export default abstract class Gameflow {
                 `event handler for "${event}"`,
                 () => this.#eventEmitter.off(event, handler),
                 'Gameflow',
-                'cleanupEventHandlers'
+                'cleanupEventHandlers',
             );
         }
         this.#eventHandlers.clear();

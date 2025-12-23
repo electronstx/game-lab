@@ -1,9 +1,16 @@
-import { CreateForm, ErrorBoundary, FooterPanel, GameContainer, HeaderPanel, SoundSettings } from "@game-lab/ui";
-import { RpsGameSettings } from "./components/ui/features/RpsGameSettings/RpsGameSettings.js";
-import { useSoundSettings } from "./utils/hooks/useSoundSettings.js";
-import { useRpsGame } from "./utils/hooks/useRpsGame.js";
-import { SoundService } from "@game-lab/core";
-import { useEffect, useMemo } from "react";
+import { SoundService } from '@game-lab/core';
+import {
+    CreateForm,
+    ErrorBoundary,
+    FooterPanel,
+    GameContainer,
+    HeaderPanel,
+    SoundSettings,
+} from '@game-lab/ui';
+import { useEffect, useMemo } from 'react';
+import { RpsGameSettings } from './components/ui/features/RpsGameSettings/RpsGameSettings.js';
+import { useRpsGame } from './utils/hooks/useRpsGame.js';
+import { useSoundSettings } from './utils/hooks/useSoundSettings.js';
 
 export const RpsGamePage = () => {
     const soundService = useMemo(() => new SoundService(), []);

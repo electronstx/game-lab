@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { isGameEndEvent, isRoundCompletedEvent } from '../../src/utils/guards.js';
 
 describe('guards', () => {
@@ -6,7 +6,7 @@ describe('guards', () => {
         it('should return true for valid RoundCompletedEvent', () => {
             const event = {
                 type: 'ROUND_COMPLETED',
-                payload: { roundNumber: 1 }
+                payload: { roundNumber: 1 },
             };
 
             expect(isRoundCompletedEvent(event)).toBe(true);

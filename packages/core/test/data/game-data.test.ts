@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import GameData from '../../src/data/game-data.js';
-import { GameStates, GameStateName } from '../../src/data/types.js';
+import { type GameStateName, GameStates } from '../../src/data/types.js';
 
 class TestGameData extends GameData {
     private testData: Record<string, unknown> = {};
@@ -157,11 +157,11 @@ describe('GameData', () => {
 
             const history = gameData.getStateHistory();
             expect(history.length).toBe(4);
-            expect(history.map(s => s.name)).toEqual([
+            expect(history.map((s) => s.name)).toEqual([
                 GameStates.INIT,
                 GameStates.START,
                 GameStates.ROUND,
-                GameStates.ROUND_RESULT
+                GameStates.ROUND_RESULT,
             ]);
         });
     });

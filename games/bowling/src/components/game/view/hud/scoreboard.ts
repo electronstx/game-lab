@@ -1,7 +1,7 @@
-import { HUDComponent } from "@game-lab/core";
-import BowlingScene from "../bowling-scene.js";
+import type { HUDComponent } from '@game-lab/core';
 import * as PIXI from 'pixi.js';
-import { ScoreboardData } from "../../data/types.js";
+import type { ScoreboardData } from '../../data/types.js';
+import type BowlingScene from '../bowling-scene.js';
 
 export class Scoreboard implements HUDComponent {
     #scene: BowlingScene;
@@ -9,13 +9,13 @@ export class Scoreboard implements HUDComponent {
     #numberOfFrames: number = 10;
     #player1FrameContainers: PIXI.Container[] = [];
     #player2FrameContainers: PIXI.Container[] = [];
-    #player1FrameTexts: { 
+    #player1FrameTexts: {
         throw1: PIXI.Text;
         throw2: PIXI.Text;
         throw3: PIXI.Text | null;
         score: PIXI.Text;
     }[] = [];
-    #player2FrameTexts: { 
+    #player2FrameTexts: {
         throw1: PIXI.Text;
         throw2: PIXI.Text;
         throw3: PIXI.Text | null;
@@ -33,14 +33,13 @@ export class Scoreboard implements HUDComponent {
     create(scale: number, numberOfFrames: number): void {
         this.#container = new PIXI.Container();
         this.#numberOfFrames = numberOfFrames;
-        
+
         const width = this.#scene.app.renderer.width;
         const height = 200 * scale;
         const y = 20 * scale;
-        
+
         const background = new PIXI.Graphics();
-        background.rect(0, 0, width, height)
-            .fill({ color: 0x1a1a1a, alpha: 0.9 });
+        background.rect(0, 0, width, height).fill({ color: 0x1a1a1a, alpha: 0.9 });
         background.roundRect(0, 0, width, height, 10 * scale);
         this.#container.addChild(background);
 
@@ -49,7 +48,7 @@ export class Scoreboard implements HUDComponent {
             fontSize: 14 * scale,
             fill: '#ffffff',
             align: 'center',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
         });
 
         const throwStyle = new PIXI.TextStyle({
@@ -57,7 +56,7 @@ export class Scoreboard implements HUDComponent {
             fontSize: 18 * scale,
             fill: '#ffffff',
             align: 'center',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
         });
 
         const scoreStyle = new PIXI.TextStyle({
@@ -65,7 +64,7 @@ export class Scoreboard implements HUDComponent {
             fontSize: 16 * scale,
             fill: '#ffff00',
             align: 'center',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
         });
 
         const totalScoreStyle = new PIXI.TextStyle({
@@ -73,7 +72,7 @@ export class Scoreboard implements HUDComponent {
             fontSize: 20 * scale,
             fill: '#00ff00',
             align: 'center',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
         });
 
         const frameWidth = width / 12;
@@ -81,47 +80,50 @@ export class Scoreboard implements HUDComponent {
         const playerRowHeight = (height - headerHeight) / 2;
         const cellHeight = playerRowHeight / 2;
 
-        const headerText = new PIXI.Text({ 
-            text: 'FRAME', 
-            style: frameNumberStyle 
+        const headerText = new PIXI.Text({
+            text: 'FRAME',
+            style: frameNumberStyle,
         });
         headerText.anchor.set(0.5);
         headerText.position.set(frameWidth / 2, headerHeight / 2);
         this.#container.addChild(headerText);
 
-        this.#player1Label = new PIXI.Text({ 
-            text: 'Player 1', 
+        this.#player1Label = new PIXI.Text({
+            text: 'Player 1',
             style: new PIXI.TextStyle({
                 fontFamily: 'Arial',
                 fontSize: 16 * scale,
                 fill: '#ffffff',
                 align: 'center',
-                fontWeight: 'bold'
-            })
+                fontWeight: 'bold',
+            }),
         });
         this.#player1Label.anchor.set(0.5);
         this.#player1Label.position.set(frameWidth / 2, headerHeight + playerRowHeight / 2);
         this.#container.addChild(this.#player1Label);
 
-        this.#player2Label = new PIXI.Text({ 
-            text: 'Player 2', 
+        this.#player2Label = new PIXI.Text({
+            text: 'Player 2',
             style: new PIXI.TextStyle({
                 fontFamily: 'Arial',
                 fontSize: 16 * scale,
                 fill: '#ffffff',
                 align: 'center',
-                fontWeight: 'bold'
-            })
+                fontWeight: 'bold',
+            }),
         });
         this.#player2Label.anchor.set(0.5);
-        this.#player2Label.position.set(frameWidth / 2, headerHeight + playerRowHeight + playerRowHeight / 2);
+        this.#player2Label.position.set(
+            frameWidth / 2,
+            headerHeight + playerRowHeight + playerRowHeight / 2,
+        );
         this.#container.addChild(this.#player2Label);
 
         for (let i = 0; i < numberOfFrames; i++) {
             const x = frameWidth * (i + 1);
-            const frameNumberText = new PIXI.Text({ 
-                text: (i + 1).toString(), 
-                style: frameNumberStyle 
+            const frameNumberText = new PIXI.Text({
+                text: (i + 1).toString(),
+                style: frameNumberStyle,
             });
             frameNumberText.anchor.set(0.5);
             frameNumberText.position.set(x + frameWidth / 2, headerHeight / 2);
@@ -131,8 +133,15 @@ export class Scoreboard implements HUDComponent {
         for (let i = 0; i < numberOfFrames; i++) {
             const x = frameWidth * (i + 1);
             const result = this.#createFrameContainer(
-                i, x, frameWidth, headerHeight, playerRowHeight, cellHeight, 
-                scale, throwStyle, scoreStyle
+                i,
+                x,
+                frameWidth,
+                headerHeight,
+                playerRowHeight,
+                cellHeight,
+                scale,
+                throwStyle,
+                scoreStyle,
             );
             this.#player1FrameContainers.push(result.container);
             this.#player1FrameTexts.push(result.texts);
@@ -142,8 +151,15 @@ export class Scoreboard implements HUDComponent {
         for (let i = 0; i < numberOfFrames; i++) {
             const x = frameWidth * (i + 1);
             const result = this.#createFrameContainer(
-                i, x, frameWidth, headerHeight + playerRowHeight, playerRowHeight, cellHeight,
-                scale, throwStyle, scoreStyle
+                i,
+                x,
+                frameWidth,
+                headerHeight + playerRowHeight,
+                playerRowHeight,
+                cellHeight,
+                scale,
+                throwStyle,
+                scoreStyle,
             );
             this.#player2FrameContainers.push(result.container);
             this.#player2FrameTexts.push(result.texts);
@@ -153,12 +169,18 @@ export class Scoreboard implements HUDComponent {
         const totalX = frameWidth * 11;
         this.#player1TotalScore = new PIXI.Text({ text: '0', style: totalScoreStyle });
         this.#player1TotalScore.anchor.set(0.5);
-        this.#player1TotalScore.position.set(totalX + frameWidth / 2, headerHeight + playerRowHeight / 2);
+        this.#player1TotalScore.position.set(
+            totalX + frameWidth / 2,
+            headerHeight + playerRowHeight / 2,
+        );
         this.#container.addChild(this.#player1TotalScore);
 
         this.#player2TotalScore = new PIXI.Text({ text: '0', style: totalScoreStyle });
         this.#player2TotalScore.anchor.set(0.5);
-        this.#player2TotalScore.position.set(totalX + frameWidth / 2, headerHeight + playerRowHeight + playerRowHeight / 2);
+        this.#player2TotalScore.position.set(
+            totalX + frameWidth / 2,
+            headerHeight + playerRowHeight + playerRowHeight / 2,
+        );
         this.#container.addChild(this.#player2TotalScore);
 
         this.#container.position.y = y;
@@ -167,12 +189,21 @@ export class Scoreboard implements HUDComponent {
     }
 
     #createFrameContainer(
-        index: number, x: number, frameWidth: number, yOffset: number, 
-        rowHeight: number, cellHeight: number, scale: number,
-        throwStyle: PIXI.TextStyle, scoreStyle: PIXI.TextStyle
-    ): { container: PIXI.Container; texts: { throw1: PIXI.Text; throw2: PIXI.Text; throw3: PIXI.Text | null; score: PIXI.Text } } {
+        index: number,
+        x: number,
+        frameWidth: number,
+        yOffset: number,
+        rowHeight: number,
+        cellHeight: number,
+        scale: number,
+        throwStyle: PIXI.TextStyle,
+        scoreStyle: PIXI.TextStyle,
+    ): {
+        container: PIXI.Container;
+        texts: { throw1: PIXI.Text; throw2: PIXI.Text; throw3: PIXI.Text | null; score: PIXI.Text };
+    } {
         const frameContainer = new PIXI.Container();
-        
+
         const line = new PIXI.Graphics();
         line.moveTo(0, 0);
         line.lineTo(0, rowHeight);
@@ -194,7 +225,7 @@ export class Scoreboard implements HUDComponent {
         let throw3: PIXI.Text | null = null;
         if (index === this.#numberOfFrames - 1) {
             throw2.position.set(frameWidth / 2, yOffset + cellHeight / 2);
-            
+
             throw3 = new PIXI.Text({ text: '', style: throwStyle });
             throw3.anchor.set(0.5);
             throw3.position.set(frameWidth / 2 + throwOffset, yOffset + cellHeight / 2);
@@ -207,15 +238,15 @@ export class Scoreboard implements HUDComponent {
         frameContainer.addChild(score);
 
         frameContainer.position.x = x;
-        
+
         return {
             container: frameContainer,
             texts: {
                 throw1,
                 throw2,
                 throw3,
-                score
-            }
+                score,
+            },
         };
     }
 
@@ -245,8 +276,9 @@ export class Scoreboard implements HUDComponent {
             const texts = this.#player1FrameTexts[index];
             if (texts) {
                 const isCurrentFrame = data.currentPlayer === 1 && index === data.currentFrame;
-                const hasData = frame.throw1 !== null || frame.throw2 !== null || frame.throw3 !== null;
-                
+                const hasData =
+                    frame.throw1 !== null || frame.throw2 !== null || frame.throw3 !== null;
+
                 if (texts.throw1) {
                     if (hasData || isCurrentFrame) {
                         texts.throw1.text = this.#formatThrow(frame.throw1, frame.isStrike, false);
@@ -257,20 +289,31 @@ export class Scoreboard implements HUDComponent {
                 if (texts.throw2) {
                     if (hasData || isCurrentFrame) {
                         const isLastFrame = index === this.#numberOfFrames - 1;
-                        
+
                         if (isLastFrame) {
                             const isStrikeOnThrow2 = frame.throw1 === 10 && frame.throw2 === 10;
-                            const isSpareOnThrow2 = frame.throw1 !== null && frame.throw1 !== 10 && 
-                                                   frame.throw2 !== null && (frame.throw1 + frame.throw2 === 10);
-                            texts.throw2.text = this.#formatThrow(frame.throw2, isStrikeOnThrow2, isSpareOnThrow2);
+                            const isSpareOnThrow2 =
+                                frame.throw1 !== null &&
+                                frame.throw1 !== 10 &&
+                                frame.throw2 !== null &&
+                                frame.throw1 + frame.throw2 === 10;
+                            texts.throw2.text = this.#formatThrow(
+                                frame.throw2,
+                                isStrikeOnThrow2,
+                                isSpareOnThrow2,
+                            );
                         } else {
-                            texts.throw2.text = this.#formatThrow(frame.throw2, false, frame.isSpare && !frame.isStrike);
+                            texts.throw2.text = this.#formatThrow(
+                                frame.throw2,
+                                false,
+                                frame.isSpare && !frame.isStrike,
+                            );
                         }
                     } else {
                         texts.throw2.text = '';
                     }
                 }
-                
+
                 if (texts.throw3 && index === this.#numberOfFrames - 1) {
                     const isStrikeOnThrow3 = frame.throw3 === 10;
                     texts.throw3.text = this.#formatThrow(frame.throw3, isStrikeOnThrow3, false);
@@ -290,8 +333,9 @@ export class Scoreboard implements HUDComponent {
             const texts = this.#player2FrameTexts[index];
             if (texts) {
                 const isCurrentFrame = data.currentPlayer === 2 && index === data.currentFrame;
-                const hasData = frame.throw1 !== null || frame.throw2 !== null || frame.throw3 !== null;
-                
+                const hasData =
+                    frame.throw1 !== null || frame.throw2 !== null || frame.throw3 !== null;
+
                 if (texts.throw1) {
                     if (hasData || isCurrentFrame) {
                         texts.throw1.text = this.#formatThrow(frame.throw1, frame.isStrike, false);
@@ -302,20 +346,31 @@ export class Scoreboard implements HUDComponent {
                 if (texts.throw2) {
                     if (hasData || isCurrentFrame) {
                         const isLastFrame = index === this.#numberOfFrames - 1;
-                        
+
                         if (isLastFrame) {
                             const isStrikeOnThrow2 = frame.throw1 === 10 && frame.throw2 === 10;
-                            const isSpareOnThrow2 = frame.throw1 !== null && frame.throw1 !== 10 && 
-                                                   frame.throw2 !== null && (frame.throw1 + frame.throw2 === 10);
-                            texts.throw2.text = this.#formatThrow(frame.throw2, isStrikeOnThrow2, isSpareOnThrow2);
+                            const isSpareOnThrow2 =
+                                frame.throw1 !== null &&
+                                frame.throw1 !== 10 &&
+                                frame.throw2 !== null &&
+                                frame.throw1 + frame.throw2 === 10;
+                            texts.throw2.text = this.#formatThrow(
+                                frame.throw2,
+                                isStrikeOnThrow2,
+                                isSpareOnThrow2,
+                            );
                         } else {
-                            texts.throw2.text = this.#formatThrow(frame.throw2, false, frame.isSpare && !frame.isStrike);
+                            texts.throw2.text = this.#formatThrow(
+                                frame.throw2,
+                                false,
+                                frame.isSpare && !frame.isStrike,
+                            );
                         }
                     } else {
                         texts.throw2.text = '';
                     }
                 }
-                
+
                 if (texts.throw3 && index === this.#numberOfFrames - 1) {
                     const isStrikeOnThrow3 = frame.throw3 === 10;
                     texts.throw3.text = this.#formatThrow(frame.throw3, isStrikeOnThrow3, false);
@@ -338,20 +393,22 @@ export class Scoreboard implements HUDComponent {
             this.#player2TotalScore.text = data.player2TotalScore.toString();
         }
 
-        const currentPlayerFrames = data.currentPlayer === 1 ? this.#player1FrameContainers : this.#player2FrameContainers;
-        const otherPlayerFrames = data.currentPlayer === 1 ? this.#player2FrameContainers : this.#player1FrameContainers;
-        
+        const currentPlayerFrames =
+            data.currentPlayer === 1 ? this.#player1FrameContainers : this.#player2FrameContainers;
+        const otherPlayerFrames =
+            data.currentPlayer === 1 ? this.#player2FrameContainers : this.#player1FrameContainers;
+
         if (currentPlayerFrames[data.currentFrame]) {
             this.#highlightFrame(currentPlayerFrames[data.currentFrame], true);
         }
-        
+
         currentPlayerFrames.forEach((container, index) => {
             if (index !== data.currentFrame) {
                 this.#highlightFrame(container, false);
             }
         });
-        
-        otherPlayerFrames.forEach(container => {
+
+        otherPlayerFrames.forEach((container) => {
             this.#highlightFrame(container, false);
         });
 
@@ -363,7 +420,11 @@ export class Scoreboard implements HUDComponent {
         }
     }
 
-    #formatThrow(value: number | null, isStrike: boolean = false, isSpare: boolean = false): string {
+    #formatThrow(
+        value: number | null,
+        isStrike: boolean = false,
+        isSpare: boolean = false,
+    ): string {
         if (value === null) return '';
         if (isStrike && value === 10) {
             return 'X';
@@ -378,8 +439,8 @@ export class Scoreboard implements HUDComponent {
     #highlightFrame(container: PIXI.Container, highlight: boolean): void {
         if (!container) return;
 
-        const existingHighlight = container.children.find(child => 
-            child instanceof PIXI.Graphics && (child as any).isHighlight
+        const existingHighlight = container.children.find(
+            (child) => child instanceof PIXI.Graphics && (child as any).isHighlight,
         );
         if (existingHighlight) {
             container.removeChild(existingHighlight);
@@ -387,7 +448,8 @@ export class Scoreboard implements HUDComponent {
 
         if (highlight) {
             const highlightRect = new PIXI.Graphics();
-            highlightRect.rect(0, 0, this.#scene.app.renderer.width / 12, 200 * this.#scene.gameScale)
+            highlightRect
+                .rect(0, 0, this.#scene.app.renderer.width / 12, 200 * this.#scene.gameScale)
                 .fill({ color: 0xffff00, alpha: 0.2 });
             (highlightRect as any).isHighlight = true;
             container.addChildAt(highlightRect, 0);

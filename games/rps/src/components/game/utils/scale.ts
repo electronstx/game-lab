@@ -1,4 +1,4 @@
-import { Application } from 'pixi.js';
+import type { Application } from 'pixi.js';
 
 export type ScaleMode = 'contain' | 'cover' | 'fixed-width' | 'fixed-height';
 type ScaleListener = (scale: number, width: number, height: number) => void;
@@ -13,7 +13,13 @@ export class ScaleManager {
     #listeners: ScaleListener[] = [];
     #resizeHandler = () => this.#resize();
 
-    constructor(app: Application, parent: HTMLElement, baseWidth = 1280, baseHeight = 768, mode: ScaleMode = 'contain') {
+    constructor(
+        app: Application,
+        parent: HTMLElement,
+        baseWidth = 1280,
+        baseHeight = 768,
+        mode: ScaleMode = 'contain',
+    ) {
         this.#app = app;
         this.#parent = parent;
         this.#baseWidth = baseWidth;
@@ -56,7 +62,7 @@ export class ScaleManager {
                 break;
         }
 
-        this.#listeners.forEach(cb => {
+        this.#listeners.forEach((cb) => {
             cb(this.#scale, width, height);
         });
     }

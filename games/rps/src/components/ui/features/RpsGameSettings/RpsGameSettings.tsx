@@ -1,13 +1,13 @@
-import { Button, ButtonGroup } from "@game-lab/ui";
-import { useState } from "react";
-import "./RpsGameSettings.css";
-import { RpsGameSettingsProps } from "./types";
+import { Button, ButtonGroup } from '@game-lab/ui';
+import { useState } from 'react';
+import './RpsGameSettings.css';
+import type { RpsGameSettingsProps } from './types';
 
 export const RpsGameSettings = ({ onStart, disabled }: RpsGameSettingsProps) => {
     const roundOptions = [
-        { label: "1", value: 1 },
-        { label: "3", value: 3 },
-        { label: "5", value: 5 },
+        { label: '1', value: 1 },
+        { label: '3', value: 3 },
+        { label: '5', value: 5 },
     ];
 
     const [numberOfRounds, setNumberOfRounds] = useState(3);

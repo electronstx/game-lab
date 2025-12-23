@@ -4,10 +4,7 @@ import './GameContainer.css';
 export const GameContainer = ({ containerRef }: GameContainerProps) => {
     return (
         <div className="game-container">
-            <div
-                ref={containerRef}
-                className="game-canvas"
-            />
+            <div ref={containerRef} className="game-canvas" />
         </div>
     );
 };

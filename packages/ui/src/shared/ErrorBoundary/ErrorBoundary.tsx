@@ -1,5 +1,5 @@
+import { handleError, RenderingError } from '@game-lab/errors';
 import React, { Component, type ReactNode } from 'react';
-import { RenderingError, handleError } from '@game-lab/errors';
 import type { ErrorBoundaryProps, ErrorBoundaryState } from './types.js';
 import './ErrorBoundary.css';
 import { safeCall } from '../../utils/safe-call.js';
@@ -9,29 +9,26 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         super(props);
         this.state = {
             hasError: false,
-            error: null
+            error: null,
         };
     }
 
     static getDerivedStateFromError(error: Error): ErrorBoundaryState {
         return {
             hasError: true,
-            error
+            error,
         };
     }
 
     componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-        const renderingError = new RenderingError(
-            `Component render error: ${error.message}`,
-            {
-                component: errorInfo.componentStack || 'Unknown',
-                method: 'render',
-                originalError: error,
-                errorInfo: {
-                    componentStack: errorInfo.componentStack
-                }
-            }
-        );
+        const renderingError = new RenderingError(`Component render error: ${error.message}`, {
+            component: errorInfo.componentStack || 'Unknown',
+            method: 'render',
+            originalError: error,
+            errorInfo: {
+                componentStack: errorInfo.componentStack,
+            },
+        });
 
         handleError(renderingError);
 
@@ -53,11 +50,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             {
                 component: 'ErrorBoundary',
                 method: 'handleUnhandledRejection',
-                originalError: event.reason
-            }
+                originalError: event.reason,
+            },
         );
         handleError(renderingError);
-        this.setState({ hasError: true, error: event.reason instanceof Error ? event.reason : new Error(String(event.reason)) });
+        this.setState({
+            hasError: true,
+            error: event.reason instanceof Error ? event.reason : new Error(String(event.reason)),
+        });
     };
 
     handleReset = () => {
@@ -65,12 +65,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             () => {
                 this.setState({
                     hasError: false,
-                    error: null
+                    error: null,
                 });
                 this.props.onReset?.();
             },
             { component: 'ErrorBoundary', method: 'handleReset' },
-            true
+            true,
         );
     };
 
@@ -88,7 +88,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                         </h2>
                         <p className="error-boundary-message">
                             {this.props.message ||
-                             'An error occurred while rendering the component'}
+                                'An error occurred while rendering the component'}
                         </p>
                         {this.props.showDetails && this.state.error && (
                             <details className="error-boundary-details">
@@ -99,10 +99,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                             </details>
                         )}
                         {this.props.showReset && (
-                            <button
-                                className="error-boundary-reset"
-                                onClick={this.handleReset}
-                            >
+                            <button className="error-boundary-reset" onClick={this.handleReset}>
                                 Try again
                             </button>
                         )}

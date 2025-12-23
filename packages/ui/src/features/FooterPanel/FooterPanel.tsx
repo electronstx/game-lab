@@ -4,7 +4,7 @@ import { SOCIAL_LINKS } from './types.js';
 
 export const FooterPanel = () => {
     return (
-        <div className='footer-panel'>
+        <div className="footer-panel">
             <div className="footer-panel-content">
                 <div className="social-links">
                     {SOCIAL_LINKS.map((link) => (
@@ -26,7 +26,7 @@ export const FooterPanel = () => {
                                             (e.target as HTMLImageElement).style.display = 'none';
                                         },
                                         { component: 'FooterPanel', method: 'imageLoad' },
-                                        true
+                                        true,
                                     );
                                 }}
                             />
@@ -36,4 +36,4 @@ export const FooterPanel = () => {
             </div>
         </div>
     );
-}
+};

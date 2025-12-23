@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GameObjects } from '../../../src/view/game-objects/game-objects.js';
 import type { GameObject } from '../../../src/view/game-objects/types.js';
 

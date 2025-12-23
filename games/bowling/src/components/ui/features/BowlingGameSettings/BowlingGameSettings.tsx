@@ -1,13 +1,13 @@
-import { Button } from "@game-lab/ui";
-import { useState } from "react";
-import "./BowlingGameSettings.css";
-import { BowlingGameSettingsProps } from "./types";
+import { Button } from '@game-lab/ui';
+import { useState } from 'react';
+import './BowlingGameSettings.css';
+import type { BowlingGameSettingsProps } from './types';
 
 export const BowlingGameSettings = ({ onStart, disabled }: BowlingGameSettingsProps) => {
     const framesOptions = [
-        { label: "3", value: 3 },
-        { label: "5", value: 5 },
-        { label: "10", value: 10 },
+        { label: '3', value: 3 },
+        { label: '5', value: 5 },
+        { label: '10', value: 10 },
     ];
 
     const [numberOfFrames, setNumberOfFrames] = useState(3);

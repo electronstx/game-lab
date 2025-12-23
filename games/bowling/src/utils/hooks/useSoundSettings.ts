@@ -1,11 +1,11 @@
+import type { SoundService, SoundSettingsState } from '@game-lab/core';
 import { useEffect, useState } from 'react';
-import { SoundService, SoundSettingsState } from '@game-lab/core';
 
 export const useSoundSettings = (soundService: SoundService) => {
     const [soundSettings, setSoundSettings] = useState<SoundSettingsState>(
-        soundService.getSettings()
+        soundService.getSettings(),
     );
-    
+
     useEffect(() => {
         const unsubscribe = soundService.subscribe((settings) => {
             setSoundSettings(settings);

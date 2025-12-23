@@ -1,9 +1,16 @@
-import { CreateForm, ErrorBoundary, FooterPanel, GameContainer, HeaderPanel, SoundSettings } from "@game-lab/ui";
-import { useSoundSettings } from "./utils/hooks/useSoundSettings.js";
-import { useBowlingGame } from "./utils/hooks/useBowlingGame.js";
-import { BowlingGameSettings } from "./components/ui/features/BowlingGameSettings/BowlingGameSettings.js";
-import { SoundService } from "@game-lab/core";
-import { useEffect, useMemo } from "react";
+import { SoundService } from '@game-lab/core';
+import {
+    CreateForm,
+    ErrorBoundary,
+    FooterPanel,
+    GameContainer,
+    HeaderPanel,
+    SoundSettings,
+} from '@game-lab/ui';
+import { useEffect, useMemo } from 'react';
+import { BowlingGameSettings } from './components/ui/features/BowlingGameSettings/BowlingGameSettings.js';
+import { useBowlingGame } from './utils/hooks/useBowlingGame.js';
+import { useSoundSettings } from './utils/hooks/useSoundSettings.js';
 
 export const BowlingGamePage = () => {
     const soundService = useMemo(() => new SoundService(), []);

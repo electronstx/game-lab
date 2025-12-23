@@ -5,4 +5,4 @@ export type GameObject = {
     update?: () => void;
     reset?: () => void;
     destroy?: () => void;
-}
+};

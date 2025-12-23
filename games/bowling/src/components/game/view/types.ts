@@ -1,5 +1,5 @@
-import { Scene } from '@game-lab/core';
-import { ScoreboardData } from "../data/types";
+import type { Scene } from '@game-lab/core';
+import type { ScoreboardData } from '../data/types';
 
 export interface IBowlingScene extends Scene {
     updateScoreboard(data: ScoreboardData): void;
@@ -17,4 +17,4 @@ export type Pin = {
     knockedDown: boolean;
     velocityX: number;
     velocityY: number;
-}
+};

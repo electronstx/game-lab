@@ -2,7 +2,7 @@ export enum ErrorSeverity {
     LOW = 'low',
     MEDIUM = 'medium',
     HIGH = 'high',
-    CRITICAL = 'critical'
+    CRITICAL = 'critical',
 }
 
 export enum ErrorCategory {
@@ -15,7 +15,7 @@ export enum ErrorCategory {
     EVENT = 'event',
     VALIDATION = 'validation',
     CLEANUP = 'cleanup',
-    UNKNOWN = 'unknown'
+    UNKNOWN = 'unknown',
 }
 
 export type ErrorContext = {
@@ -24,7 +24,7 @@ export type ErrorContext = {
     method?: string;
     state?: string;
     timestamp?: number;
-}
+};
 
 export type ErrorReport = {
     error: Error;
@@ -33,4 +33,4 @@ export type ErrorReport = {
     context?: ErrorContext;
     recoverable: boolean;
     timestamp: number;
-}
+};

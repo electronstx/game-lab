@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi, afterEach, type MockedFunction } from 'vitest';
-import { SoundService } from '../../../src/services/sound/sound-service.js';
-import { mockHowlInstance, MockHowl } from '../../setup.js';
 import { Howler } from 'howler';
+import { afterEach, beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest';
+import { SoundService } from '../../../src/services/sound/sound-service.js';
 import type { SoundConfig, SoundSettingsState } from '../../../src/services/sound/types.js';
+import { MockHowl, mockHowlInstance } from '../../setup.js';
 
 describe('SoundService', () => {
     let service: SoundService;
@@ -108,18 +108,16 @@ describe('SoundService', () => {
             expect(mockAddEventListener).toHaveBeenCalledWith(
                 'beforeunload',
                 expect.any(Function),
-                { capture: true, signal: expect.any(AbortSignal) }
+                { capture: true, signal: expect.any(AbortSignal) },
             );
-            expect(mockAddEventListener).toHaveBeenCalledWith(
-                'pagehide',
-                expect.any(Function),
-                { capture: true, signal: expect.any(AbortSignal) }
-            );
-            expect(mockAddEventListener).toHaveBeenCalledWith(
-                'unload',
-                expect.any(Function),
-                { capture: true, signal: expect.any(AbortSignal) }
-            );
+            expect(mockAddEventListener).toHaveBeenCalledWith('pagehide', expect.any(Function), {
+                capture: true,
+                signal: expect.any(AbortSignal),
+            });
+            expect(mockAddEventListener).toHaveBeenCalledWith('unload', expect.any(Function), {
+                capture: true,
+                signal: expect.any(AbortSignal),
+            });
         });
     });
 
@@ -265,7 +263,9 @@ describe('SoundService', () => {
             expect(soundId).toBeUndefined();
             expect(consoleWarnSpy).toHaveBeenCalled();
             expect(consoleWarnSpy.mock.calls[0][0]).toContain('[GameError]');
-            expect(consoleWarnSpy.mock.calls[0][0]).toContain('Sound "unregistered" is not registered');
+            expect(consoleWarnSpy.mock.calls[0][0]).toContain(
+                'Sound "unregistered" is not registered',
+            );
             consoleWarnSpy.mockRestore();
         });
 
@@ -700,8 +700,13 @@ describe('SoundService', () => {
     describe('page unload handler', () => {
         it('should stop all sounds on page unload', () => {
             const handlers = mockAddEventListener.mock.calls
-                .filter(call => call[0] === 'beforeunload' || call[0] === 'pagehide' || call[0] === 'unload')
-                .map(call => call[1] as () => void);
+                .filter(
+                    (call) =>
+                        call[0] === 'beforeunload' ||
+                        call[0] === 'pagehide' ||
+                        call[0] === 'unload',
+                )
+                .map((call) => call[1] as () => void);
 
             expect(handlers.length).toBeGreaterThan(0);
             handlers[0]!();
@@ -723,7 +728,9 @@ describe('SoundService', () => {
 
             expect(consoleInfoSpy).toHaveBeenCalled(); // Изменить на consoleInfoSpy
             expect(consoleInfoSpy.mock.calls[0][0]).toContain('[StorageError]');
-            expect(consoleInfoSpy.mock.calls[0][0]).toContain('Failed to save sound settings to localStorage');
+            expect(consoleInfoSpy.mock.calls[0][0]).toContain(
+                'Failed to save sound settings to localStorage',
+            );
             consoleInfoSpy.mockRestore();
 
             mockLocalStorage.setItem = originalSetItem;

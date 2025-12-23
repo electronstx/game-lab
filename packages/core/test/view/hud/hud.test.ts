@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HUD } from '../../../src/view/hud/hud.js';
 import type { HUDComponent } from '../../../src/view/hud/types.js';
 

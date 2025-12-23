@@ -1,12 +1,12 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+    "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
     "vcs": {
         "enabled": false,
         "clientKind": "git",
         "useIgnoreFile": false
     },
     "files": {
-        "include": ["games/**/*", "packages/**/*"],
+        "includes": ["games/**/*", "packages/**/*"],
         "ignoreUnknown": false
     },
     "formatter": {
@@ -18,7 +18,14 @@
     "linter": {
         "enabled": true,
         "rules": {
-            "recommended": true
+            "recommended": true,
+            "correctness": {
+                "noUnusedImports": "warn",
+                "noUnusedVariables": "warn"
+            },
+            "suspicious": {
+                "noExplicitAny": "warn"
+            }
         }
     },
     "javascript": {
@@ -27,13 +34,12 @@
         },
         "parser": {
             "unsafeParameterDecoratorsEnabled": true
-        }
+        },
+        "globals": ["console", "window", "document"]
     },
     "overrides": [
         {
-            "includes": [
-                "**/*.svelte"
-            ],
+            "includes": ["**/*.svelte"],
             "linter": {
                 "rules": {
                     "style": {

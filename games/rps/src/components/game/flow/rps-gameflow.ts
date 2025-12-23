@@ -1,8 +1,8 @@
-import { Gameflow, GameData, Scene, GameEvents } from "@game-lab/core";
-import RpsGameData from "../data/rps-game-data";
-import { isRoundResultData, isRpsGameSettings, isRpsMove } from "../utils/guards";
+import { type GameData, GameEvents, Gameflow, type Scene } from '@game-lab/core';
+import type RpsGameData from '../data/rps-game-data';
+import { isRoundResultData, isRpsGameSettings, isRpsMove } from '../utils/guards';
 
-export default class RpsGameflow extends Gameflow{
+export default class RpsGameflow extends Gameflow {
     constructor(gameData: GameData, scene: Scene) {
         super(gameData, scene);
     }
@@ -42,15 +42,15 @@ export default class RpsGameflow extends Gameflow{
     protected override setupCustomEventHandlers(): void {
         const animationCompletedHandler = (roundResultData: unknown) => {
             if (!isRoundResultData(roundResultData)) return;
-    
+
             if (roundResultData.result) {
                 this.emit(GameEvents.GAME_END, roundResultData.result);
                 return;
             }
-    
+
             this.emit(GameEvents.ROUND_STARTED);
         };
-    
+
         this.subscribe('ANIMATION_COMPLETED', animationCompletedHandler);
     }
 }

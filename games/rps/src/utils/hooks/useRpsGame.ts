@@ -1,7 +1,7 @@
-import { useCallback, useRef, useState, useEffect, useMemo } from 'react';
+import { GameEvents, type SoundService } from '@game-lab/core';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { RpsGame } from '../../components/game/index.js';
-import { RpsGameSettings as RpsGameSettingsType } from '../../components/game/types.js';
-import { GameEvents, SoundService } from '@game-lab/core';
+import type { RpsGameSettings as RpsGameSettingsType } from '../../components/game/types.js';
 
 export const useRpsGame = (soundService: SoundService) => {
     const game = useMemo(() => new RpsGame(soundService), [soundService]);
@@ -20,7 +20,7 @@ export const useRpsGame = (soundService: SoundService) => {
             try {
                 await Promise.all([
                     game.off(GameEvents.GAME_INIT, handleInit),
-                    game.off(GameEvents.GAME_STARTED, handleStarted)
+                    game.off(GameEvents.GAME_STARTED, handleStarted),
                 ]);
             } catch (error) {
                 if (!isDestroyed) {
@@ -61,19 +61,22 @@ export const useRpsGame = (soundService: SoundService) => {
         };
     }, [game]);
 
-    const startGame = useCallback(async (settings: RpsGameSettingsType) => {
-        try {
-            await game.whenReady;
-            await game.setGameSettings(settings);
-            await game.startGame();
-        } catch (error) {
-            console.error('Error starting game:', error);
-        }
-    }, [game]);
+    const startGame = useCallback(
+        async (settings: RpsGameSettingsType) => {
+            try {
+                await game.whenReady;
+                await game.setGameSettings(settings);
+                await game.startGame();
+            } catch (error) {
+                console.error('Error starting game:', error);
+            }
+        },
+        [game],
+    );
 
     return {
         containerRef,
         startGame,
-        isGameStarted
+        isGameStarted,
     };
 };

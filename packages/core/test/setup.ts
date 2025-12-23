@@ -1,4 +1,4 @@
-import { MockedFunction, vi } from 'vitest';
+import { type MockedFunction, vi } from 'vitest';
 
 vi.mock('pixi.js', async (importOriginal) => {
     const actual = await importOriginal<typeof import('pixi.js')>();
@@ -48,7 +48,8 @@ const mockHowlInstance: MockHowlInstance = {
 // Create MockHowl as a constructor that returns mockHowlInstance
 const MockHowl = vi.fn().mockImplementation(function MockHowl(this: any, config: HowlConfig) {
     return mockHowlInstance;
-}) as unknown as MockedFunction<new (config: HowlConfig) => MockHowlInstance> & ((config: HowlConfig) => MockHowlInstance);
+}) as unknown as MockedFunction<new (config: HowlConfig) => MockHowlInstance> &
+    ((config: HowlConfig) => MockHowlInstance);
 
 // Make it callable as a constructor
 Object.setPrototypeOf(MockHowl, Function.prototype);

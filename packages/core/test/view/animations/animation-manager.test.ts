@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AnimationManager } from '../../../src/view/animations/animation-manager.js';
 import type { GameAnimation } from '../../../src/view/animations/types.js';
 

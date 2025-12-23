@@ -1,11 +1,11 @@
+import { GameEvents, GameStates, type SoundService } from '@game-lab/core';
 import { Application } from 'pixi.js';
-import BowlingScene from './view/bowling-scene.js';
-import { IBowlingScene } from './view/types.js';
 import BowlingGameData from './data/bowling-game-data.js';
 import BowlingGameflow from './flow/bowling-gameflow.js';
-import { ScaleManager } from "./utils/scale.js";
-import { GameEvents, GameStates, SoundService } from '@game-lab/core';
-import { BowlingGameSettings, Game } from './types.js';
+import type { BowlingGameSettings, Game } from './types.js';
+import { ScaleManager } from './utils/scale.js';
+import BowlingScene from './view/bowling-scene.js';
+import type { IBowlingScene } from './view/types.js';
 
 export class BowlingGame implements Game {
     #app: Application | null = null;
@@ -17,9 +17,9 @@ export class BowlingGame implements Game {
     #abortController: AbortController | null = null;
     #soundService: SoundService;
 
-	constructor(soundService: SoundService) {
-		this.#soundService = soundService;
-	}
+    constructor(soundService: SoundService) {
+        this.#soundService = soundService;
+    }
 
     async init(parent: HTMLDivElement) {
         this.#abortController = new AbortController();
@@ -37,40 +37,47 @@ export class BowlingGame implements Game {
                     autoDensity: true,
                     preference: 'webgl',
                     resizeTo: parent,
-                    autoStart: false
+                    autoStart: false,
                 });
 
                 if (signal.aborted) return null;
 
                 if (!this.#app.canvas) return null;
-				parent.appendChild(this.#app.canvas);
+                parent.appendChild(this.#app.canvas);
 
                 this.#scaleManager = new ScaleManager(this.#app, parent, 1280, 768, 'contain');
 
-                this.#gameScene = new BowlingScene(this.#app, this.#soundService, this.#scaleManager.scale);
+                this.#gameScene = new BowlingScene(
+                    this.#app,
+                    this.#soundService,
+                    this.#scaleManager.scale,
+                );
                 this.#app.stage.addChild(this.#gameScene);
                 await this.#gameScene.create();
 
                 if (!signal.aborted) {
-					this.#app.ticker.start();
-					this.#gameData = new BowlingGameData(GameStates.INIT);
-					this.#gameflow = new BowlingGameflow(this.#gameData, this.#gameScene as IBowlingScene);
-				}
+                    this.#app.ticker.start();
+                    this.#gameData = new BowlingGameData(GameStates.INIT);
+                    this.#gameflow = new BowlingGameflow(
+                        this.#gameData,
+                        this.#gameScene as IBowlingScene,
+                    );
+                }
 
                 if (this.#scaleManager) {
-					this.#scaleManager.onResize((scale, w, h) => {
-						if (!signal.aborted && this.#gameScene) {
-							this.#gameScene.onResize(scale, w, h);
-						}
-					});
-				}
+                    this.#scaleManager.onResize((scale, w, h) => {
+                        if (!signal.aborted && this.#gameScene) {
+                            this.#gameScene.onResize(scale, w, h);
+                        }
+                    });
+                }
 
                 return this.#gameScene;
             } catch (error) {
                 if (signal.aborted) {
-					return null;
-				}
-				throw error;
+                    return null;
+                }
+                throw error;
             }
         })();
 

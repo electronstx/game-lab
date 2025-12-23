@@ -1,12 +1,12 @@
-import { GameEvents, Scene, SoundService } from '@game-lab/core';
+import { GameEvents, Scene, type SoundService } from '@game-lab/core';
 import * as PIXI from 'pixi.js';
-import { Score } from './hud/score';
-import { ChoicePanel } from './hud/choice-panel';
-import { Round } from './hud/round';
+import type { RoundResultData } from '../data/types';
+import { EndGameAnimation } from './animations/end-game-animation';
 import { RoundAnimation } from './animations/round-animation';
 import { StartScreenAnimation } from './animations/start-screen-animation';
-import { RoundResultData } from '../data/types';
-import { EndGameAnimation } from './animations/end-game-animation';
+import { ChoicePanel } from './hud/choice-panel';
+import { Round } from './hud/round';
+import { Score } from './hud/score';
 
 export default class RpsScene extends Scene {
     #bg?: PIXI.Sprite;
@@ -44,7 +44,7 @@ export default class RpsScene extends Scene {
 
         this.#bg = PIXI.Sprite.from('background');
         this.#bg.anchor.set(0.5);
-		this.#updateBackgroundSize();
+        this.#updateBackgroundSize();
         this.addChild(this.#bg);
 
         this.#startScreenAnimation.create(this.gameScale);
@@ -75,7 +75,10 @@ export default class RpsScene extends Scene {
     }
 
     override showStartScreen(): void {
-        this.animationManager.show(this.#startScreenAnimation, 'Choose number of rounds\n and start the game!');
+        this.animationManager.show(
+            this.#startScreenAnimation,
+            'Choose number of rounds\n and start the game!',
+        );
     }
 
     override initHUD(playerScore: number, opponentScore: number): void {

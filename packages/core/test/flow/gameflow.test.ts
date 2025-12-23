@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import Gameflow from '../../src/flow/gameflow.js';
+import type * as PIXI from 'pixi.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { type EventEmitter, GameEvents } from '../../src/data/events.js';
 import GameData from '../../src/data/game-data.js';
+import { GameStateName, GameStates } from '../../src/data/types.js';
+import Gameflow from '../../src/flow/gameflow.js';
+import type { SoundService } from '../../src/services/sound/sound-service.js';
 import Scene from '../../src/view/scene.js';
-import { GameStates, GameStateName } from '../../src/data/types.js';
-import { GameEvents, EventEmitter } from '../../src/data/events.js';
-import * as PIXI from 'pixi.js';
-import { SoundService } from '../../src/services/sound/sound-service.js';
 
 class TestGameData extends GameData {
     private testData: Record<string, unknown> = {};
@@ -78,7 +78,7 @@ describe('Gameflow', () => {
                 handlers.get(event)?.delete(handler);
             }),
             emit: vi.fn((event: string, ...args: unknown[]) => {
-                handlers.get(event)?.forEach(handler => handler(...args));
+                handlers.get(event)?.forEach((handler) => handler(...args));
             }),
             once: vi.fn((event: string, handler: (...args: unknown[]) => void) => {
                 const onceHandler = (...args: unknown[]) => {
@@ -125,8 +125,9 @@ describe('Gameflow', () => {
             const changeStateSpy = vi.spyOn(gameData, 'changeState');
             const showStartScreenSpy = vi.spyOn(scene, 'showStartScreen');
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.GAME_INIT)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.GAME_INIT,
+            )?.[1];
 
             if (handler) {
                 handler();
@@ -138,8 +139,9 @@ describe('Gameflow', () => {
         it('should handle GAME_STARTED event', () => {
             const startGameSpy = vi.spyOn(gameflow, 'startGame');
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.GAME_STARTED)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.GAME_STARTED,
+            )?.[1];
 
             if (handler) {
                 handler();
@@ -150,8 +152,9 @@ describe('Gameflow', () => {
         it('should handle ROUND_STARTED event', () => {
             const startRoundSpy = vi.spyOn(gameflow, 'startRound');
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.ROUND_STARTED)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.ROUND_STARTED,
+            )?.[1];
 
             if (handler) {
                 handler();
@@ -164,8 +167,9 @@ describe('Gameflow', () => {
             const payload = { roundNumber: 1, winner: 'player1' };
             const event = { type: 'ROUND_COMPLETED', payload };
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.ROUND_COMPLETED)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.ROUND_COMPLETED,
+            )?.[1];
 
             if (handler) {
                 handler(event);
@@ -177,16 +181,17 @@ describe('Gameflow', () => {
             const showRoundResultSpy = vi.spyOn(gameflow, 'showRoundResult');
             gameData.setRoundNumber(2);
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.ROUND_COMPLETED)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.ROUND_COMPLETED,
+            )?.[1];
 
             if (handler) {
                 handler('rock');
                 expect(showRoundResultSpy).toHaveBeenCalledWith(
                     expect.objectContaining({
                         playerMove: 'rock',
-                        roundNumber: 2
-                    })
+                        roundNumber: 2,
+                    }),
                 );
             }
         });
@@ -196,16 +201,17 @@ describe('Gameflow', () => {
             gameData.setRoundNumber(3);
             const data = { winner: 'player1', score: 10 };
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.ROUND_COMPLETED)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.ROUND_COMPLETED,
+            )?.[1];
 
             if (handler) {
                 handler(data);
                 expect(showRoundResultSpy).toHaveBeenCalledWith(
                     expect.objectContaining({
                         ...data,
-                        roundNumber: 3
-                    })
+                        roundNumber: 3,
+                    }),
                 );
             }
         });
@@ -215,8 +221,9 @@ describe('Gameflow', () => {
             const payload = { result: 'win', timescale: 1.5 };
             const event = { type: 'GAME_END', payload };
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.GAME_END)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.GAME_END,
+            )?.[1];
 
             if (handler) {
                 handler(event);
@@ -229,8 +236,9 @@ describe('Gameflow', () => {
             const payload = { result: 'lose' };
             const event = { type: 'GAME_END', payload };
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.GAME_END)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.GAME_END,
+            )?.[1];
 
             if (handler) {
                 handler(event);
@@ -241,8 +249,9 @@ describe('Gameflow', () => {
         it('should handle GAME_END event with direct data', () => {
             const showEndGameSpy = vi.spyOn(gameflow, 'showEndGame');
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.GAME_END)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.GAME_END,
+            )?.[1];
 
             if (handler) {
                 handler('win');
@@ -253,8 +262,9 @@ describe('Gameflow', () => {
         it('should handle GAME_RESTARTED event', () => {
             const restartGameSpy = vi.spyOn(gameflow, 'restartGame');
 
-            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls
-                .find(([event]) => event === GameEvents.GAME_RESTARTED)?.[1];
+            const handler = (mockEventEmitter.on as ReturnType<typeof vi.fn>).mock.calls.find(
+                ([event]) => event === GameEvents.GAME_RESTARTED,
+            )?.[1];
 
             if (handler) {
                 handler();
@@ -322,7 +332,8 @@ describe('Gameflow', () => {
             const handler1 = vi.fn();
             gameflow['subscribe']('OLD_EVENT', handler1);
 
-            const initialOffCalls = (mockEventEmitter.off as ReturnType<typeof vi.fn>).mock.calls.length;
+            const initialOffCalls = (mockEventEmitter.off as ReturnType<typeof vi.fn>).mock.calls
+                .length;
 
             gameflow.cleanupEventHandlers();
 
@@ -351,9 +362,11 @@ describe('Gameflow', () => {
 
             gameflow.destroy();
 
-            const emitCallsBefore = (mockEventEmitter.emit as ReturnType<typeof vi.fn>).mock.calls.length;
+            const emitCallsBefore = (mockEventEmitter.emit as ReturnType<typeof vi.fn>).mock.calls
+                .length;
             gameflow['emit']('TEST_EVENT_AFTER_DESTROY');
-            const emitCallsAfter = (mockEventEmitter.emit as ReturnType<typeof vi.fn>).mock.calls.length;
+            const emitCallsAfter = (mockEventEmitter.emit as ReturnType<typeof vi.fn>).mock.calls
+                .length;
 
             expect(emitCallsAfter).toBe(emitCallsBefore);
 
@@ -400,15 +413,15 @@ describe('Gameflow', () => {
                 type: 'ROUND_COMPLETED',
                 payload: {
                     ...resultData,
-                    roundNumber: gameData.getRoundData()
-                }
+                    roundNumber: gameData.getRoundData(),
+                },
             });
 
             expect(showRoundResultSpy).toHaveBeenCalledWith(
                 expect.objectContaining({
                     ...resultData,
-                    roundNumber: gameData.getRoundData()
-                })
+                    roundNumber: gameData.getRoundData(),
+                }),
             );
         });
 
@@ -418,7 +431,7 @@ describe('Gameflow', () => {
             const eventEmitter = scene.getEventEmitter();
             eventEmitter.emit(GameEvents.GAME_END, {
                 type: 'GAME_END',
-                payload: { result: 'win', timescale: 1.5 }
+                payload: { result: 'win', timescale: 1.5 },
             });
 
             expect(showEndGameSpy).toHaveBeenCalledWith('win', 1.5);

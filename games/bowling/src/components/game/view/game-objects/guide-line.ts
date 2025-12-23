@@ -1,5 +1,5 @@
+import type { GameObject, Scene } from '@game-lab/core';
 import * as PIXI from 'pixi.js';
-import { GameObject, Scene } from '@game-lab/core';
 
 export class GuideLine implements GameObject {
     #sprite: PIXI.Graphics;
@@ -39,7 +39,7 @@ export class GuideLine implements GameObject {
         if (!this.#isRotating) return;
 
         this.#angle += this.#rotationSpeed * this.#rotationDirection;
-        
+
         if (this.#angle >= Math.PI * 0.2) {
             this.#angle = Math.PI * 0.2;
             this.#rotationDirection = -1;
@@ -58,11 +58,11 @@ export class GuideLine implements GameObject {
     show(): void {
         this.#sprite.visible = true;
     }
-    
+
     hide(): void {
         this.#sprite.visible = false;
     }
-    
+
     destroy(): void {
         this.#sprite.destroy();
     }

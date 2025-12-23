@@ -3,7 +3,7 @@ export type ThrowResult = {
     totalPins: number;
     isStrike: boolean;
     isSpare: boolean;
-}
+};
 
 export type Frame = {
     throw1: number | null;
@@ -12,7 +12,7 @@ export type Frame = {
     frameScore: number | null;
     isStrike: boolean;
     isSpare: boolean;
-}
+};
 
 export type ScoreboardData = {
     player1Frames: Frame[];
@@ -22,4 +22,4 @@ export type ScoreboardData = {
     currentThrow: number;
     player1TotalScore: number;
     player2TotalScore: number;
-}
+};

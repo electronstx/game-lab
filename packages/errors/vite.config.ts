@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
     build: {
@@ -7,10 +7,10 @@ export default defineConfig({
             entry: resolve(__dirname, 'src/index.ts'),
             name: 'GameLabErrors',
             fileName: 'index',
-            formats: ['es']
+            formats: ['es'],
         },
         rollupOptions: {
-            external: []
-        }
-    }
+            external: [],
+        },
+    },
 });

@@ -1,4 +1,4 @@
-import { ErrorSeverity, ErrorCategory, ErrorContext } from './types.js';
+import { ErrorCategory, type ErrorContext, ErrorSeverity } from './types.js';
 
 export class GameError extends Error {
     readonly severity: ErrorSeverity;
@@ -12,7 +12,7 @@ export class GameError extends Error {
         severity: ErrorSeverity = ErrorSeverity.MEDIUM,
         category: ErrorCategory = ErrorCategory.UNKNOWN,
         context?: ErrorContext,
-        recoverable: boolean = true
+        recoverable: boolean = true,
     ) {
         super(message);
         this.name = 'GameError';
@@ -32,7 +32,7 @@ export class GameError extends Error {
             context: this.context,
             recoverable: this.recoverable,
             timestamp: this.timestamp,
-            stack: this.stack
+            stack: this.stack,
         };
     }
 }
@@ -51,7 +51,7 @@ export class ResourceLoadingError extends GameError {
             ErrorSeverity.MEDIUM,
             ErrorCategory.RESOURCE_LOADING,
             { ...context, resource },
-            true
+            true,
         );
         this.name = 'ResourceLoadingError';
     }
@@ -59,13 +59,7 @@ export class ResourceLoadingError extends GameError {
 
 export class AudioError extends GameError {
     constructor(message: string, soundKey?: string, context?: ErrorContext) {
-        super(
-            message,
-            ErrorSeverity.LOW,
-            ErrorCategory.AUDIO,
-            { ...context, soundKey },
-            true
-        );
+        super(message, ErrorSeverity.LOW, ErrorCategory.AUDIO, { ...context, soundKey }, true);
         this.name = 'AudioError';
     }
 }
@@ -84,7 +78,7 @@ export class StateError extends GameError {
             ErrorSeverity.HIGH,
             ErrorCategory.STATE_MANAGEMENT,
             { ...context, state },
-            false
+            false,
         );
         this.name = 'StateError';
     }
@@ -104,7 +98,7 @@ export class CleanupError extends GameError {
             ErrorSeverity.LOW,
             ErrorCategory.CLEANUP,
             { ...context, cleanupTarget: target },
-            true
+            true,
         );
         this.name = 'CleanupError';
     }
@@ -112,13 +106,7 @@ export class CleanupError extends GameError {
 
 export class RenderingError extends GameError {
     constructor(message: string, context?: ErrorContext) {
-        super(
-            message,
-            ErrorSeverity.HIGH,
-            ErrorCategory.RENDERING,
-            context,
-            true
-        );
+        super(message, ErrorSeverity.HIGH, ErrorCategory.RENDERING, context, true);
         this.name = 'RenderingError';
     }
 }

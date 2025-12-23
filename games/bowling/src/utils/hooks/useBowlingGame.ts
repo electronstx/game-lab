@@ -1,7 +1,7 @@
-import { useCallback, useRef, useState, useEffect, useMemo } from 'react';
+import { GameEvents, type SoundService } from '@game-lab/core';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BowlingGame } from '../../components/game/index.js';
-import { BowlingGameSettings } from '../../components/game/types.js';
-import { GameEvents, SoundService } from '@game-lab/core';
+import type { BowlingGameSettings } from '../../components/game/types.js';
 
 export const useBowlingGame = (soundService: SoundService) => {
     const game = useMemo(() => new BowlingGame(soundService), [soundService]);
@@ -20,7 +20,7 @@ export const useBowlingGame = (soundService: SoundService) => {
             try {
                 await Promise.all([
                     game.off(GameEvents.GAME_INIT, handleInit),
-                    game.off(GameEvents.GAME_STARTED, handleStarted)
+                    game.off(GameEvents.GAME_STARTED, handleStarted),
                 ]);
             } catch (error) {
                 if (!isDestroyed) {
@@ -61,19 +61,22 @@ export const useBowlingGame = (soundService: SoundService) => {
         };
     }, [game]);
 
-    const startGame = useCallback(async (settings: BowlingGameSettings) => {
-        try {
-            await game.whenReady;
-            await game.setGameSettings(settings);
-            await game.startGame();
-        } catch (error) {
-            console.error('Error starting game:', error);
-        }
-    }, [game]);
+    const startGame = useCallback(
+        async (settings: BowlingGameSettings) => {
+            try {
+                await game.whenReady;
+                await game.setGameSettings(settings);
+                await game.startGame();
+            } catch (error) {
+                console.error('Error starting game:', error);
+            }
+        },
+        [game],
+    );
 
     return {
         containerRef,
         startGame,
-        isGameStarted
+        isGameStarted,
     };
 };

@@ -6,10 +6,13 @@
         "ci:build": "pnpm -r run build",
         "ci:version": "changeset version",
         "ci:publish": "changeset publish",
-        "cs": "changeset"
+        "cs": "changeset",
+        "lint": "biome check .",
+        "lint:fix": "biome check --write .",
+        "format": "biome format --write ."
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.2.4",
+        "@biomejs/biome": "^2.3.10",
         "@changesets/cli": "^2.29.7",
         "prettier": "^3.4.2",
         "prettier-plugin-tailwindcss": "^0.6.11",

@@ -1,5 +1,5 @@
-import { GameState, GameStateName, GameStates } from "./types";
-import { ValidationError, StateError, handleErrorSilently } from '@game-lab/errors';
+import { handleErrorSilently, StateError, ValidationError } from '@game-lab/errors';
+import { type GameState, type GameStateName, GameStates } from './types';
 
 export default abstract class GameData {
     protected gameSettings: Record<string, unknown>;
@@ -17,10 +17,10 @@ export default abstract class GameData {
 
     setGameSettings(settings: Record<string, unknown>): void {
         if (!settings || typeof settings !== 'object' || Array.isArray(settings)) {
-            const validationError = new ValidationError(
-                'Invalid game settings provided',
-                { component: 'GameData', method: 'setGameSettings' }
-            );
+            const validationError = new ValidationError('Invalid game settings provided', {
+                component: 'GameData',
+                method: 'setGameSettings',
+            });
             handleErrorSilently(validationError);
             return;
         }
@@ -33,11 +33,10 @@ export default abstract class GameData {
 
     changeState(newState: GameStateName, metadata?: Record<string, unknown>): void {
         if (!Object.values(GameStates).includes(newState)) {
-            const stateError = new StateError(
-                `Invalid state "${newState}"`,
-                newState,
-                { component: 'GameData', method: 'changeState' }
-            );
+            const stateError = new StateError(`Invalid state "${newState}"`, newState, {
+                component: 'GameData',
+                method: 'changeState',
+            });
             handleErrorSilently(stateError);
             return;
         }
@@ -76,10 +75,12 @@ export default abstract class GameData {
         this.gameSettings = {};
         const initialState = GameStates.INIT;
         this.currentState = initialState;
-        this.stateHistory = [{
-            name: initialState,
-            enteredAt: Date.now(),
-        }];
+        this.stateHistory = [
+            {
+                name: initialState,
+                enteredAt: Date.now(),
+            },
+        ];
         this.resetData();
     }
 

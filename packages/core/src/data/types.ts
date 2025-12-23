@@ -6,7 +6,7 @@ export const GameStates = {
     ROUND: 'round',
     ROUND_RESULT: 'round-result',
     END: 'end',
-    RESTART: 'restart'
+    RESTART: 'restart',
 } as const;
 
 export type GameState = {

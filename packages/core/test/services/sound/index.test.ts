@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { createSoundService } from "../../../src/services/sound/index.js";
-import { SoundService } from "../../../src/index.js";
+import { describe, expect, it } from 'vitest';
+import { SoundService } from '../../../src/index.js';
+import { createSoundService } from '../../../src/services/sound/index.js';
 
 describe('createSoundService', () => {
     it('should create a new SoundService instance', () => {

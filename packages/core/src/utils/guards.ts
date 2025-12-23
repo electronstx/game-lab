@@ -1,4 +1,4 @@
-import { GameEndEvent, RoundCompletedEvent } from "../data/events";
+import type { GameEndEvent, RoundCompletedEvent } from '../data/events';
 
 export function isRoundCompletedEvent(data: unknown): data is RoundCompletedEvent {
     if (typeof data !== 'object' || data === null) {
@@ -18,7 +18,10 @@ export function isRoundCompletedEvent(data: unknown): data is RoundCompletedEven
         return false;
     }
 
-    return 'roundNumber' in payload && typeof (payload as { roundNumber: unknown }).roundNumber === 'number';
+    return (
+        'roundNumber' in payload &&
+        typeof (payload as { roundNumber: unknown }).roundNumber === 'number'
+    );
 }
 
 export function isGameEndEvent(data: unknown): data is GameEndEvent {

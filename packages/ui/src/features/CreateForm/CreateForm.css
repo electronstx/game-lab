@@ -72,8 +72,8 @@
     color: #1565c0;
 }
 
-.create-form input, 
-.create-form select, 
+.create-form input,
+.create-form select,
 .create-form textarea {
     padding: 8px 12px;
     border: 1px solid #90caf9;
@@ -84,8 +84,8 @@
     transition: all 0.2s ease;
 }
 
-.create-form input:focus, 
-.create-form select:focus, 
+.create-form input:focus,
+.create-form select:focus,
 .create-form textarea:focus {
     outline: none;
     border-color: #2196f3;

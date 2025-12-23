@@ -1,11 +1,18 @@
+import {
+    ErrorCategory,
+    ErrorSeverity,
+    GameError,
+    handleError,
+    handleErrorSilently,
+    InitializationError,
+} from '@game-lab/errors';
 import * as PIXI from 'pixi.js';
-import { HUD } from './hud/hud.js';
+import type { EventEmitter } from '../data/events.js';
+import type { SoundService } from '../services/sound/sound-service.js';
+import { safeCleanup } from '../utils/cleanup.js';
 import { AnimationManager } from './animations/animation-manager.js';
 import { GameObjects } from './game-objects/game-objects.js';
-import { EventEmitter } from '../data/events.js';
-import { SoundService } from '../services/sound/sound-service.js';
-import { ErrorCategory, ErrorSeverity, GameError, handleError, handleErrorSilently, InitializationError } from '@game-lab/errors';
-import { safeCleanup } from '../utils/cleanup.js';
+import { HUD } from './hud/hud.js';
 
 export default abstract class Scene extends PIXI.Container {
     app: PIXI.Application;
@@ -62,15 +69,20 @@ export default abstract class Scene extends PIXI.Container {
                                     `Error in once event handler for "${event}"`,
                                     ErrorSeverity.MEDIUM,
                                     ErrorCategory.EVENT,
-                                    { component: 'Scene', method: 'getEventEmitter.once', event, originalError: error },
-                                    true
+                                    {
+                                        component: 'Scene',
+                                        method: 'getEventEmitter.once',
+                                        event,
+                                        originalError: error,
+                                    },
+                                    true,
                                 );
                                 handleErrorSilently(gameError);
                             }
                         };
                         stage.on(event, onceHandler);
                     }
-                }
+                },
             };
 
             return this.#eventEmitterAdapter;
@@ -78,7 +90,7 @@ export default abstract class Scene extends PIXI.Container {
 
         const error = new InitializationError(
             'PIXI.Application stage does not implement EventEmitter interface',
-            { component: 'Scene', method: 'getEventEmitter' }
+            { component: 'Scene', method: 'getEventEmitter' },
         );
         handleError(error);
 
