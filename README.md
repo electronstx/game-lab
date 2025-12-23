@@ -67,3 +67,4 @@ game-lab/
 - [Руководство по разработке](./docs/DEVELOPMENT.md)
 - [Документация Core](./packages/core/README.md)
 - [Документация UI](./packages/ui/README.md)
+- [Документация Errors](./packages/errors/README.md)

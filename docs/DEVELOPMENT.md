@@ -6,6 +6,7 @@
 
 Создайте новую папку в `games/` со следующей структурой:
 
+```
 games/your-game/
 ├── src/
 │ ├── components/
@@ -24,10 +25,12 @@ games/your-game/
 │ └── YourGamePage.tsx
 ├── package.json
 └── vite.config.ts
+```
 
 
 ### Шаг 2: Настройка package.json
 
+```typescript
 {
   "name": "@game-lab/your-game",
   "version": "0.1.0",
@@ -49,9 +52,11 @@ games/your-game/
     "@game-lab/ui": "workspace:*"
   }
 }
+```
 
 ### Шаг 3: Реализация GameData
 
+```typescript
 import GameData from '@game-lab/core';
 import { GameStates } from '@game-lab/core';
 
@@ -65,9 +70,11 @@ export default class YourGameData extends GameData {
 
   // Реализуйте методы для управления состоянием игры
 }
+```
 
 ### Шаг 4: Реализация Scene
 
+```typescript
 import Scene from '@game-lab/core';
 import * as PIXI from 'pixi.js';
 import { SoundService } from '@game-lab/core';
@@ -86,9 +93,11 @@ export default class YourScene extends Scene {
     // Очистка ресурсов
   }
 }
+```
 
 ### Шаг 5: Реализация Gameflow
 
+```typescript
 import Gameflow from '@game-lab/core';
 import YourGameData from './data/your-game-data';
 import YourScene from './view/your-scene';
@@ -121,9 +130,11 @@ export default class YourGameflow extends Gameflow {
     // Перезапуск игры
   }
 }
+```
 
 ### Шаг 6: Реализация Game
 
+```typescript
 import { Application } from 'pixi.js';
 import { SoundService } from '@game-lab/core';
 import { Game } from './types';
@@ -149,9 +160,11 @@ export class YourGame implements Game {
     // Очистка всех ресурсов
   }
 }
+```
 
 ### Шаг 7: React компонент
 
+```tsx
 import { useYourGame } from './utils/hooks/useYourGame';
 import { GameContainer, HeaderPanel } from '@game-lab/ui';
 
@@ -165,6 +178,7 @@ export const YourGamePage = () => {
     </>
   );
 };
+```
 
 ## Тестирование
 
