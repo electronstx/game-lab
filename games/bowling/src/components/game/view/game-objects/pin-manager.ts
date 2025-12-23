@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { GameObject, Scene } from '@parity-games/core';
+import { GameObject, Scene } from '@game-lab/core';
 import { Pin } from '../types.js';
 
 export class PinManager implements GameObject{

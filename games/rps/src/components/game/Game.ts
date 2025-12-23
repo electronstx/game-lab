@@ -3,7 +3,7 @@ import RpsScene from './view/rps-scene.js';
 import RpsGameData from './data/rps-game-data.js';
 import RpsGameflow from './flow/rps-gameflow.js';
 import { ScaleManager } from "./utils/scale.js";
-import { GameEvents, GameStates, SoundService } from '@parity-games/core';
+import { GameEvents, GameStates, SoundService } from '@game-lab/core';
 import { getAssets } from './assets-manifest.js';
 import { initGameSounds } from './sounds.js';
 import { Game, RpsGameSettings } from './types.js';

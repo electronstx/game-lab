@@ -1,4 +1,4 @@
-import { CleanupError, handleErrorSilently } from "@parity-games/errors";
+import { CleanupError, handleErrorSilently } from "@game-lab/errors";
 
 export function safeCleanup(
     name: string,

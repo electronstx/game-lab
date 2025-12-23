@@ -1,4 +1,4 @@
-import { HUDComponent } from "@parity-games/core";
+import { HUDComponent } from "@game-lab/core";
 import BowlingScene from "../bowling-scene.js";
 import * as PIXI from 'pixi.js';
 import { ScoreboardData } from "../../data/types.js";

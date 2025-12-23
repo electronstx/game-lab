@@ -1,1 +1,1 @@
-# parity-games
+# game-lab

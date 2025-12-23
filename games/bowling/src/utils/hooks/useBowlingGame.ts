@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import { BowlingGame } from '../../components/game/index.js';
 import { BowlingGameSettings } from '../../components/game/types.js';
-import { GameEvents, SoundService } from '@parity-games/core';
+import { GameEvents, SoundService } from '@game-lab/core';
 
 export const useBowlingGame = (soundService: SoundService) => {
     const game = useMemo(() => new BowlingGame(soundService), [soundService]);

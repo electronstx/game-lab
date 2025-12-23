@@ -1,4 +1,4 @@
-import { GameData, GameStateName } from "@parity-games/core";
+import { GameData, GameStateName } from "@game-lab/core";
 import { RoundResultData } from "./types";
 import { isNumber } from "../utils/guards";
 

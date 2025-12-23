@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { GameObject, Scene } from '@parity-games/core';
+import { GameObject, Scene } from '@game-lab/core';
 
 export class Lane implements GameObject {
     #container: PIXI.Container;

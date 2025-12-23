@@ -1,5 +1,5 @@
 import React, { Component, type ReactNode } from 'react';
-import { RenderingError, handleError } from '@parity-games/errors';
+import { RenderingError, handleError } from '@game-lab/errors';
 import type { ErrorBoundaryProps, ErrorBoundaryState } from './types.js';
 import './ErrorBoundary.css';
 import { safeCall } from '../../utils/safe-call.js';

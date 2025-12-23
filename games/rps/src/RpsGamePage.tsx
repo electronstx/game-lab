@@ -1,8 +1,8 @@
-import { CreateForm, ErrorBoundary, FooterPanel, GameContainer, HeaderPanel, SoundSettings } from "@parity-games/ui";
+import { CreateForm, ErrorBoundary, FooterPanel, GameContainer, HeaderPanel, SoundSettings } from "@game-lab/ui";
 import { RpsGameSettings } from "./components/ui/features/RpsGameSettings/RpsGameSettings.js";
 import { useSoundSettings } from "./utils/hooks/useSoundSettings.js";
 import { useRpsGame } from "./utils/hooks/useRpsGame.js";
-import { SoundService } from "@parity-games/core";
+import { SoundService } from "@game-lab/core";
 import { useEffect, useMemo } from "react";
 
 export const RpsGamePage = () => {

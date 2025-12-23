@@ -7,7 +7,7 @@ export default defineConfig({
     build: {
         lib: {
             entry: resolve(__dirname, 'src/index.ts'),
-            name: 'ParityGamesUI',
+            name: 'GameLabUI',
             fileName: 'index',
             formats: ['es']
         },

@@ -1,4 +1,4 @@
-import { Scene } from '@parity-games/core';
+import { Scene } from '@game-lab/core';
 import { ScoreboardData } from "../data/types";
 
 export interface IBowlingScene extends Scene {

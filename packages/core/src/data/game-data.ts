@@ -1,5 +1,5 @@
 import { GameState, GameStateName, GameStates } from "./types";
-import { ValidationError, StateError, handleErrorSilently } from '@parity-games/errors';
+import { ValidationError, StateError, handleErrorSilently } from '@game-lab/errors';
 
 export default abstract class GameData {
     protected gameSettings: Record<string, unknown>;

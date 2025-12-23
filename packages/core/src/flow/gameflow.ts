@@ -1,4 +1,4 @@
-import { ErrorCategory, ErrorSeverity, GameError, handleError, handleErrorSilently, InitializationError, StateError } from "@parity-games/errors";
+import { ErrorCategory, ErrorSeverity, GameError, handleError, handleErrorSilently, InitializationError, StateError } from "@game-lab/errors";
 import { GameEndEvent, GameEvents, EventEmitter, RoundCompletedEvent, RoundStartedEvent } from "../data/events.js";
 import GameData from "../data/game-data.js";
 import { GameStateName, GameStates, StateEnterData } from "../data/types.js";

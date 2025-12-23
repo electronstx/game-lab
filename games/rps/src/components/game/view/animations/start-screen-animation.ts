@@ -1,4 +1,4 @@
-import { GameAnimation } from '@parity-games/core';
+import { GameAnimation } from '@game-lab/core';
 import gsap from 'gsap';
 import RpsScene from '../rps-scene';
 import * as PIXI from 'pixi.js';

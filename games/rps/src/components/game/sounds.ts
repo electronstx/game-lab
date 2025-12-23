@@ -1,4 +1,4 @@
-import { SoundService } from '@parity-games/core';
+import { SoundService } from '@game-lab/core';
 
 export function initGameSounds(soundService: SoundService) {
 	soundService.registerMusic('bgMusic', {

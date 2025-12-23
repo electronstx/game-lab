@@ -1,4 +1,4 @@
-import { GameData, GameStateName } from "@parity-games/core";
+import { GameData, GameStateName } from "@game-lab/core";
 import { ThrowResult, Frame, ScoreboardData } from "./types.js";
 import { isBowlingGameSettings } from "../utils/guards.js";
 

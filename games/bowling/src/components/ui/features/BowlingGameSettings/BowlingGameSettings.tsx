@@ -1,4 +1,4 @@
-import { Button } from "@parity-games/ui";
+import { Button } from "@game-lab/ui";
 import { useState } from "react";
 import "./BowlingGameSettings.css";
 import { BowlingGameSettingsProps } from "./types";

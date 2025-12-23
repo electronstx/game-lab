@@ -4,7 +4,7 @@ import { IBowlingScene } from './view/types.js';
 import BowlingGameData from './data/bowling-game-data.js';
 import BowlingGameflow from './flow/bowling-gameflow.js';
 import { ScaleManager } from "./utils/scale.js";
-import { GameEvents, GameStates, SoundService } from '@parity-games/core';
+import { GameEvents, GameStates, SoundService } from '@game-lab/core';
 import { BowlingGameSettings, Game } from './types.js';
 
 export class BowlingGame implements Game {

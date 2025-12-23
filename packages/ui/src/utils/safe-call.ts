@@ -1,4 +1,4 @@
-import { GameError, ErrorSeverity, ErrorCategory, handleError, handleErrorSilently } from '@parity-games/errors';
+import { GameError, ErrorSeverity, ErrorCategory, handleError, handleErrorSilently } from '@game-lab/errors';
 
 export function safeCall<T>(
     fn: () => T,

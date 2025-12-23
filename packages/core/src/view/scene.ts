@@ -4,7 +4,7 @@ import { AnimationManager } from './animations/animation-manager.js';
 import { GameObjects } from './game-objects/game-objects.js';
 import { EventEmitter } from '../data/events.js';
 import { SoundService } from '../services/sound/sound-service.js';
-import { ErrorCategory, ErrorSeverity, GameError, handleError, handleErrorSilently, InitializationError } from '@parity-games/errors';
+import { ErrorCategory, ErrorSeverity, GameError, handleError, handleErrorSilently, InitializationError } from '@game-lab/errors';
 import { safeCleanup } from '../utils/cleanup.js';
 
 export default abstract class Scene extends PIXI.Container {

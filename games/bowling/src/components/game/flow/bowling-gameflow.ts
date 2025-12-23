@@ -1,4 +1,4 @@
-import { Gameflow, GameData, GameEvents } from "@parity-games/core";
+import { Gameflow, GameData, GameEvents } from "@game-lab/core";
 import BowlingGameData from "../data/bowling-game-data.js";
 import { isBowlingGameSettings } from "../utils/guards.js";
 import { IBowlingScene } from "../view/types.js";

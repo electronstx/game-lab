@@ -1,4 +1,4 @@
-import { Gameflow, GameData, Scene, GameEvents } from "@parity-games/core";
+import { Gameflow, GameData, Scene, GameEvents } from "@game-lab/core";
 import RpsGameData from "../data/rps-game-data";
 import { isRoundResultData, isRpsGameSettings, isRpsMove } from "../utils/guards";
 

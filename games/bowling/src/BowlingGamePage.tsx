@@ -1,8 +1,8 @@
-import { CreateForm, ErrorBoundary, FooterPanel, GameContainer, HeaderPanel, SoundSettings } from "@parity-games/ui";
+import { CreateForm, ErrorBoundary, FooterPanel, GameContainer, HeaderPanel, SoundSettings } from "@game-lab/ui";
 import { useSoundSettings } from "./utils/hooks/useSoundSettings.js";
 import { useBowlingGame } from "./utils/hooks/useBowlingGame.js";
 import { BowlingGameSettings } from "./components/ui/features/BowlingGameSettings/BowlingGameSettings.js";
-import { SoundService } from "@parity-games/core";
+import { SoundService } from "@game-lab/core";
 import { useEffect, useMemo } from "react";
 
 export const BowlingGamePage = () => {

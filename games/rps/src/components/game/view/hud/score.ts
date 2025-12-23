@@ -1,4 +1,4 @@
-import { HUDComponent } from "@parity-games/core";
+import { HUDComponent } from "@game-lab/core";
 import RpsScene from "../rps-scene";
 import * as PIXI from 'pixi.js';
 import { RoundResultData } from "../../data/types";

@@ -1,4 +1,4 @@
-import { GameEvents, Scene, SoundService } from '@parity-games/core';
+import { GameEvents, Scene, SoundService } from '@game-lab/core';
 import * as PIXI from 'pixi.js';
 import { Scoreboard } from './hud/scoreboard.js';
 import { Lane } from './game-objects/lane.js';

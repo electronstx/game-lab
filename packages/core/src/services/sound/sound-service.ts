@@ -1,9 +1,9 @@
 import { Howl, Howler } from 'howler';
 import type { SoundConfig, SoundKey, SoundSettingsState, SoundType } from './types.js';
-import { AudioError, ErrorCategory, ErrorSeverity, GameError, handleErrorSilently, StorageError } from '@parity-games/errors';
+import { AudioError, ErrorCategory, ErrorSeverity, GameError, handleErrorSilently, StorageError } from '@game-lab/errors';
 import { safeCleanup } from '../../utils/cleanup.js';
 
-const SOUND_SETTINGS_KEY = 'parity-games-sound-settings';
+const SOUND_SETTINGS_KEY = 'game-lab-sound-settings';
 
 export class SoundService {
 	#soundSettings: SoundSettingsState;

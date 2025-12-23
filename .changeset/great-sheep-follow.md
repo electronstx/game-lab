@@ -1,5 +1,5 @@
 ---
-"@parity-games/core": patch
+"@game-lab/core": patch
 ---
 
 Add unit-tests for core package.

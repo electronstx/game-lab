@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, useEffect, useMemo } from 'react';
 import { RpsGame } from '../../components/game/index.js';
 import { RpsGameSettings as RpsGameSettingsType } from '../../components/game/types.js';
-import { GameEvents, SoundService } from '@parity-games/core';
+import { GameEvents, SoundService } from '@game-lab/core';
 
 export const useRpsGame = (soundService: SoundService) => {
     const game = useMemo(() => new RpsGame(soundService), [soundService]);

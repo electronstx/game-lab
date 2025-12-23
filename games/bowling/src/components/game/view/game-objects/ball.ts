@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { GameObject, Scene } from '@parity-games/core';
+import { GameObject, Scene } from '@game-lab/core';
 
 export class Ball implements GameObject {
     #sprite: PIXI.Graphics;

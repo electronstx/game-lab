@@ -1,6 +1,6 @@
 ---
-"@parity-games/core": patch
-"@parity-games/rps": patch
+"@game-lab/core": patch
+"@game-lab/rps": patch
 ---
 
 Create RPS game with some rework of core package

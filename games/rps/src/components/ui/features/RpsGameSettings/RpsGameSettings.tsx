@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from "@parity-games/ui";
+import { Button, ButtonGroup } from "@game-lab/ui";
 import { useState } from "react";
 import "./RpsGameSettings.css";
 import { RpsGameSettingsProps } from "./types";

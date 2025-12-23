@@ -1,5 +1,5 @@
 {
-    "name": "@parity-games/ui",
+    "name": "@game-lab/ui",
     "version": "0.1.0",
     "private": true,
     "type": "module",
@@ -20,7 +20,7 @@
         "lint": "biome check ."
     },
     "dependencies": {
-        "@parity-games/errors": "workspace:*"
+        "@game-lab/errors": "workspace:*"
     },
     "peerDependencies": {
         "react": "^18.3.1",

@@ -1,5 +1,5 @@
 {
-    "name": "@parity-games/core",
+    "name": "@game-lab/core",
     "version": "0.1.0",
     "private": true,
     "type": "module",
@@ -23,7 +23,7 @@
         "test:coverage": "vitest --coverage"
     },
     "dependencies": {
-        "@parity-games/errors": "workspace:*",
+        "@game-lab/errors": "workspace:*",
         "howler": "^2.2.4",
         "pixi.js": "^8.14.3"
     },

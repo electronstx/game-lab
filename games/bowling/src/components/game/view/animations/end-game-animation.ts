@@ -1,4 +1,4 @@
-import { GameAnimation, GameEvents } from '@parity-games/core';
+import { GameAnimation, GameEvents } from '@game-lab/core';
 import gsap from 'gsap';
 import BowlingScene from '../bowling-scene';
 import * as PIXI from 'pixi.js';

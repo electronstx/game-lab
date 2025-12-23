@@ -1,5 +1,5 @@
 import { ChoiceConfig } from './types';
-import { GameEvents, HUDComponent } from "@parity-games/core";
+import { GameEvents, HUDComponent } from "@game-lab/core";
 import RpsScene from "../rps-scene";
 import * as PIXI from 'pixi.js';
 import { playClickSound, playHoverSound } from '../../sounds';

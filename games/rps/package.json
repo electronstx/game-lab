@@ -1,5 +1,5 @@
 {
-    "name": "@parity-games/rps",
+    "name": "@game-lab/rps",
     "version": "0.1.0",
     "private": true,
     "type": "module",
@@ -15,8 +15,8 @@
         "pixi.js": "^8.14.3",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "@parity-games/core": "workspace:*",
-        "@parity-games/ui": "workspace:*"
+        "@game-lab/core": "workspace:*",
+        "@game-lab/ui": "workspace:*"
     },
     "devDependencies": {
         "@biomejs/biome": "^2.2.4",
