@@ -171,6 +171,7 @@ React компоненты, организованные по **Feature-Sliced D
 
 Каждая игра следует единой структуре:
 
+```
 games/[game-name]/src/
 ├── components/
 │ ├── game/ # Игровая логика (MVP)
@@ -187,9 +188,11 @@ games/[game-name]/src/
 ├── utils/
 │ └── hooks/ # React хуки
 └── [Game]Page.tsx # Главный React компонент
+```
 
 ## Поток данных
 
+```
 React Component (UI) [FSD]
 ↓
 Game (init, start, destroy)
@@ -199,6 +202,7 @@ Gameflow (Presenter) ← → GameData (Model)
 Scene (View) → PixiJS Rendering
 ↓
 GameObjects (Manager) → GameObject instances
+```
 
 ## Система событий
 
@@ -224,6 +228,7 @@ GameObjects (Manager) → GameObject instances
 
 Игровые объекты реализуют интерфейс `GameObject` и управляются через `GameObjects` менеджер:
 
+```typescript
 interface GameObject {
   create(...args: any[]): void;
   show?(): void;
@@ -232,5 +237,6 @@ interface GameObject {
   reset?(): void;
   destroy?(): void;
 }
+```
 
 Менеджер обеспечивает централизованное управление жизненным циклом всех объектов на сцене.
