@@ -18,6 +18,6 @@
 
 ## Использование
 
-\`\`\`typescript
+```typescript
 import { Gameflow, Scene, SoundService } from '@game-lab/core';
-\`\`\`
+```

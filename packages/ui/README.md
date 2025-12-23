@@ -20,7 +20,7 @@
 
 ## Использование
 
-\`\`\`typescript
+```typescript
 import {
   GameContainer,
   HeaderPanel,
@@ -30,11 +30,11 @@ import {
   ErrorBoundary
 } from '@game-lab/ui';
 import '@game-lab/ui/style.css';
-\`\`\`
+```
 
 ## Пример
 
-\`\`\`tsx
+```tsx
 import { GameContainer, HeaderPanel } from '@game-lab/ui';
 
 export const GamePage = () => {
@@ -47,4 +47,4 @@ export const GamePage = () => {
     </>
   );
 };
-\`\`\`
+```

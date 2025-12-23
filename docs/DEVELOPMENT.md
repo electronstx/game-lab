@@ -170,36 +170,36 @@ export const YourGamePage = () => {
 
 ### Запуск тестов Core пакета
 
-\`\`\`bash
+```bash
 cd packages/core
 pnpm test
-\`\`\`
+```
 
 ### Покрытие тестами
 
-\`\`\`bash
+```bash
 cd packages/core
 pnpm test:coverage
-\`\`\`
+```
 
 ## Линтинг
 
-\`\`\`bash
+```bash
 # Проверка всего проекта
 pnpm -r run lint
 
 # Проверка конкретного пакета/игры
 cd packages/core
 pnpm lint
-\`\`\`
+```
 
 ## Сборка
 
-\`\`\`bash
+```bash
 # Сборка всех пакетов
 pnpm ci:build
 
 # Сборка конкретного пакета
 cd packages/core
 pnpm build
-\`\`\`
+```

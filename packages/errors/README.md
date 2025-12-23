@@ -11,7 +11,7 @@
 
 ## Использование
 
-\`\`\`typescript
+```typescript
 import {
   GameError,
   InitializationError,
@@ -30,7 +30,7 @@ handleError(error);
 
 // Тихая обработка (не бросает исключение)
 handleErrorSilently(error);
-\`\`\`
+```
 
 ## Категории и уровни серьезности
 
